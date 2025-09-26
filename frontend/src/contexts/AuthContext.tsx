@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import axios from 'axios'
 
+type Role = 'student' | 'trainer'
+
 interface User {
   id: string
   name: string
   email: string
-  role: 'student' | 'trainer'
+  role: Role
   profile?: any
   stats?: any
 }
@@ -13,8 +15,8 @@ interface User {
 interface AuthContextType {
   user: User | null
   loading: boolean
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
-  register: (userData: any) => Promise<{ success: boolean; error?: string }>
+  login: (email: string, password: string) => Promise<{ success: boolean; user?: User; error?: string }>
+  register: (userData: any) => Promise<{ success: boolean; user?: User; error?: string }>
   logout: () => void
   updateProfile: (updates: any) => Promise<{ success: boolean; error?: string }>
 }
@@ -32,7 +34,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'))
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'))
 
   useEffect(() => {
     if (token) {
@@ -41,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       setLoading(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
 
   const fetchUser = async () => {
@@ -58,18 +61,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     try {
       const response = await axios.post('/api/auth/login', { email, password })
-      const { token, user } = response.data
-      
-      localStorage.setItem('token', token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      setToken(token)
-      setUser(user)
-      
-      return { success: true }
+      const { token: jwtToken, user: userFromServer } = response.data
+
+      if (jwtToken) {
+        localStorage.setItem('token', jwtToken)
+        axios.defaults.headers.common['Authorization'] = `Bearer ${jwtToken}`
+        setToken(jwtToken)
+      }
+
+      setUser(userFromServer)
+
+      return { success: true, user: userFromServer }
     } catch (error: any) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Login failed' 
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Login failed'
       }
     }
   }
@@ -77,18 +83,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (userData: any) => {
     try {
       const response = await axios.post('/api/auth/register', userData)
-      const { token, user } = response.data
-      
-      localStorage.setItem('token', token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      setToken(token)
-      setUser(user)
-      
-      return { success: true }
+      const { token: jwtToken, user: userFromServer } = response.data
+
+      if (jwtToken) {
+        localStorage.setItem('token', jwtToken)
+        axios.defaults.headers.common['Authorization'] = `Bearer ${jwtToken}`
+        setToken(jwtToken)
+      }
+
+      setUser(userFromServer)
+
+      return { success: true, user: userFromServer }
     } catch (error: any) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Registration failed' 
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Registration failed'
       }
     }
   }
@@ -106,14 +115,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(response.data)
       return { success: true }
     } catch (error: any) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Profile update failed' 
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Profile update failed'
       }
     }
   }
 
-  const value = {
+  const value: AuthContextType = {
     user,
     loading,
     login,
@@ -122,9 +131,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateProfile
   }
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

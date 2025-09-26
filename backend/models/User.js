@@ -1,15 +1,13 @@
+// models/User.js
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-/**
- * Sub-schemas used in profile.trainer fields
- */
 const LanguageSchema = new mongoose.Schema({
   language: { type: String, trim: true, required: true },
   proficiency: { type: String, enum: ['Native', 'Fluent'], default: 'Fluent' },
-  teachingLevel: [{ type: String, trim: true }] // e.g. 'Beginner','Intermediate','Advanced','Business','Exam Prep'
+  teachingLevel: [{ type: String, trim: true }]
 }, { _id: false });
 
 const CertificationSchema = new mongoose.Schema({
@@ -19,140 +17,103 @@ const CertificationSchema = new mongoose.Schema({
     type: Number,
     validate: {
       validator: function (v) {
-        if (v === undefined || v === null || v === '') return true;
+        if (v === undefined || v === null) return true;
         return Number.isInteger(v) && v >= 1950 && v <= CURRENT_YEAR;
       },
       message: props => `Certification year must be between 1950 and ${CURRENT_YEAR}`
     },
-    default: ''
+    default: null
   }
 }, { _id: false });
 
 const AvailabilitySchema = new mongoose.Schema({
-  day: { type: String, trim: true, required: true }, // monday..sunday
-  startTime: { type: String, default: null }, // store 'HH:MM' or ISO substring
+  day: {
+    type: String,
+    enum: ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'],
+    required: true
+  },
+  startTime: { type: String, default: null },
   endTime: { type: String, default: null },
   available: { type: Boolean, default: false }
 }, { _id: false });
 
-/**
- * Main user schema
- */
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6
-  },
-  role: {
-    type: String,
-    enum: ['student', 'trainer'],
-    required: true
-  },
-  // profile contains generic user profile and a trainer-specific subset
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
+  password: { type: String, required: true, minlength: 8 },
+  role: { type: String, enum: ['student', 'trainer'], required: true },
   profile: {
+    // basic
     bio: { type: String, trim: true, default: '' },
 
-    // simple list when the user is a student or fallback short format
+    // primary image URL (single) - used for trainers & students
+    imageUrl: { type: String, trim: true, default: '' },
+
+    // already-existing avatar (kept for compatibility)
+    avatar: { type: String, trim: true, default: '' },
+
+    // student-specific fields (students + trainers can have these; optional)
+    highestQualification: { type: String, trim: true, default: '' },
+    collegeName: { type: String, trim: true, default: '' },
+
+    // languages as array of strings for simple UI usage
     languages: [{ type: String, trim: true }],
 
-    // trainer rich languages (if using richer structure)
+    // richer trainer languages (optional)
     trainerLanguages: { type: [LanguageSchema], default: [] },
 
-    // trainer-specific numeric fields
-    experience: { type: Number, min: 0, default: 0 }, // years
+    experience: { type: Number, min: 0, default: 0 },
     hourlyRate: { type: Number, min: 0, default: 25 },
 
-    avatar: { type: String, trim: true, default: '' },
     phone: { type: String, trim: true, default: '' },
     location: { type: String, trim: true, default: '' },
 
-    // tags and specializations
+    // list of specializations
     specializations: { type: [String], default: [] },
 
-    // certifications
     certifications: { type: [CertificationSchema], default: [] },
-
-    // availability
     availability: { type: [AvailabilitySchema], default: [] },
 
-    // demo video embed url (youtube embed or watch url)
     demoVideo: { type: String, trim: true, default: '' },
-
-    // profile images (public urls)
     profileImages: { type: [String], default: [] },
 
-    // social links
-    socialMedia: {
-      instagram: { type: String, trim: true, default: '' },
-      youtube: { type: String, trim: true, default: '' },
-      linkedin: { type: String, trim: true, default: '' },
-      // additional keys allowed by storing as Mixed if needed
-    },
+    // Map of social links - can be updated by sending plain object from frontend
+    socialMedia: { type: Map, of: String, default: {} },
 
-    // teaching style & student demographics
     teachingStyle: { type: String, trim: true, default: 'Conversational' },
-    studentAge: { type: [String], default: [] }, // e.g., ['Kids', 'Teens', 'Adults']
+    studentAge: { type: [String], default: [] },
 
     isAvailable: { type: Boolean, default: true },
-
-    // optional quick stats (mirror of user.stats or derived)
     totalBookings: { type: Number, default: 0 },
     averageRating: { type: Number, default: 5.0 }
   },
-
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-
+  isActive: { type: Boolean, default: true },
   stats: {
     totalSessions: { type: Number, default: 0 },
     completedSessions: { type: Number, default: 0 },
     totalEarnings: { type: Number, default: 0 },
     rating: { type: Number, default: 5.0 }
   }
-}, {
-  timestamps: true
-});
+}, { timestamps: true });
 
-/**
- * Password hashing
- */
+// Hash password before save (only when modified)
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 });
 
-/**
- * Compare candidate password
- */
+// Instance method for comparing password
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-/**
- * Convenience: ensure availability array contains all days (optional)
- */
+// Ensure full availability array (helper)
 userSchema.methods.ensureFullAvailability = function () {
   const ALL_DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
   const existing = (this.profile?.availability || []).reduce((acc, a) => { acc[a.day] = a; return acc; }, {});

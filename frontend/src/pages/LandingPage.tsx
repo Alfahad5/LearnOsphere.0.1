@@ -22,11 +22,8 @@ import { Navbar, Nav, Container, Offcanvas, Button } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 // LinguaNest — Enhanced Landing Page (single-file React component)
-// Changes made:
-// - New, curated Unsplash images relevant to language learning / conversation / tutors
-// - More persuasive marketing copy across hero, features, reviews and CTA
-// - UI polish: badges, animated stats, microcopy, accessible attributes
-// - Slightly longer FAQ and details for trust + guarantees
+// Adjusted image positions: hero image lifted up slightly and the three overlapping
+// cards have been moved upwards for a stronger visual overlap and nicer composition.
 
 export default function LandingPageAlt() {
   const [mounted, setMounted] = useState(false)
@@ -101,15 +98,15 @@ export default function LandingPageAlt() {
     }
   ]
 
-  // Curated images (Unsplash) relevant to language learning, conversation, tutors
-  const heroImage = 'https://images.unsplash.com/photo-1529345401982-2b3e8a5a1f2e?q=80&w=1400&auto=format&fit=crop'
-  const cardImage1 = 'https://images.unsplash.com/photo-1555949963-aa79dcee981d?q=80&w=800&auto=format&fit=crop'
+  // Curated images (Unsplash)
+  const heroImage = 'https://ufhealthjax.org/assets/images/stories/_860x573_crop_center-center_line/Overcoming-Language-Barriers-in-Health-Care.jpg'
+  const cardImage1 = 'https://gurmentor.com/wp-content/uploads/2020/11/gurmentor.com-best-language-learning-methods-and-teaching-approaches-explained-2020-11-17_16-21-09_140956.png'
   const cardImage2 = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600&auto=format&fit=crop'
   const cardImage3 = 'https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=900&auto=format&fit=crop'
 
   return (
     <div className="min-h-screen font-inter bg-[linear-gradient(180deg,#f8fbff_0%,#fffef9_60%)] text-slate-900">
-      <div className="h-2 bg-gradient-to-r from-[#0ea5a3] via-[#6ee7b7] to-[#f97316]" aria-hidden />
+      
 
       <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-sm border-b border-white/40">
         <Container className="py-3">
@@ -119,15 +116,15 @@ export default function LandingPageAlt() {
                 <Globe className="text-white" />
               </div>
               <div>
-                <div className="text-lg font-semibold">LinguaNest</div>
+                <div className="text-lg font-semibold">LearnOSphere</div>
                 <div className="text-xs text-slate-500 -mt-1">Live lessons · Micro-courses</div>
               </div>
             </div>
 
             <nav className="hidden sm:flex items-center gap-6">
               <Link to="/trainers" className="text-sm font-medium hover:text-[#0ea5a3]">Trainers</Link>
-              <Link to="/plans" className="text-sm font-medium hover:text-[#0ea5a3]">Pricing</Link>
-              <Link to="/about" className="text-sm font-medium hover:text-[#0ea5a3]">About</Link>
+              
+              
               <Link to="/login" className="text-sm font-medium text-slate-700 hover:text-slate-900">Sign in</Link>
               <Link to="/register" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0ea5a3] text-white text-sm font-semibold shadow hover:scale-105 transition">Get started</Link>
             </nav>
@@ -141,7 +138,7 @@ export default function LandingPageAlt() {
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                   <Nav className="flex-column gap-2">
-                    <Nav.Link as={Link} to="/trainers" onClick={() => setShowOffcanvas(false)}>Trainers</Nav.Link>
+                    <Nav.Link as={Link} to="/main" onClick={() => setShowOffcanvas(false)}>Trainers</Nav.Link>
                     <Nav.Link as={Link} to="/plans" onClick={() => setShowOffcanvas(false)}>Pricing</Nav.Link>
                     <Nav.Link as={Link} to="/about" onClick={() => setShowOffcanvas(false)}>About</Nav.Link>
                     <Nav.Link as={Link} to="/login" onClick={() => setShowOffcanvas(false)}>Sign in</Nav.Link>
@@ -181,7 +178,7 @@ export default function LandingPageAlt() {
               </div>
 
               <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-xl">
-                {['Spanish', 'French', 'German', 'Italian', 'Japanese', 'Mandarin'].map((l) => (
+                {['english','Spanish'].map((l) => (
                   <button key={l} className="flex items-center gap-3 px-4 py-3 rounded-full bg-white shadow-sm border hover:scale-[1.02] transition-transform focus:outline-none focus:ring-2 focus:ring-[#0ea5a3]" aria-label={`Browse ${l}`}>
                     <div className="w-7 h-7 rounded-full bg-[#fde68a] flex items-center justify-center text-sm">{l[0]}</div>
                     <span className="text-sm font-medium">{l}</span>
@@ -215,35 +212,36 @@ export default function LandingPageAlt() {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0 }} animate={mounted ? { opacity: 1 } : {}} transition={{ delay: 0.2 }}>
-              <div className="relative w-full max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl">
-                <img loading="lazy" src={heroImage} alt="students practicing a language together" className="w-full h-96 object-cover" />
+            <motion.div initial={{ opacity: 0 }} animate={mounted ? { opacity: 1 } : {}} transition={{ delay: 0.2 }} className="relative w-full max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl -translate-y-6 md:-translate-y-12">
+              <img loading="lazy" src={heroImage} alt="students practicing a language together" className="w-full h-[420px] md:h-96 lg:h-[520px] object-cover" />
 
-                <div className="absolute left-6 bottom-6 w-52 rounded-xl overflow-hidden shadow-lg border-2 border-white bg-white">
-                  <img loading="lazy" src={cardImage1} alt="culture and conversation" className="w-full h-32 object-cover" />
-                  <div className="p-3">
-                    <div className="text-sm font-semibold">Cultural conversations</div>
-                    <div className="text-xs text-slate-500">Contextual lessons you’ll actually use</div>
-                  </div>
+              {/* Left card - moved up */}
+              <div className="absolute left-6 bottom-24 w-52 rounded-xl overflow-hidden shadow-lg border-2 border-white bg-white">
+                <img loading="lazy" src={cardImage1} alt="culture and conversation" className="w-full h-32 object-cover" />
+                <div className="p-3">
+                  <div className="text-sm font-semibold">Cultural conversations</div>
+                  <div className="text-xs text-slate-500">Contextual lessons you’ll actually use</div>
                 </div>
-
-                <div className="absolute right-6 top-6 w-44 rounded-xl overflow-hidden shadow-lg border-2 border-white bg-white">
-                  <img loading="lazy" src={cardImage2} alt="tutor profile" className="w-full h-40 object-cover" />
-                  <div className="p-3">
-                    <div className="text-sm font-semibold">Meet tutors</div>
-                    <div className="text-xs text-slate-500">See video intros & ratings</div>
-                  </div>
-                </div>
-
-                <div className="absolute -right-10 bottom-20 w-64 rounded-xl overflow-hidden shadow-lg border-2 border-white bg-white">
-                  <div className="p-4">
-                    <div className="text-lg font-bold">Practice prompts</div>
-                    <div className="text-xs text-slate-500 mt-2">Short tasks to try between lessons</div>
-                  </div>
-                  <img loading="lazy" src={cardImage3} alt="mini lesson" className="w-full h-20 object-cover" />
-                </div>
-
               </div>
+
+              {/* Right top card - nudged slightly higher */}
+              <div className="absolute right-6 top-2 w-44 rounded-xl overflow-hidden shadow-lg border-2 border-white bg-white">
+                <img loading="lazy" src={cardImage2} alt="tutor profile" className="w-full h-40 object-cover" />
+                <div className="p-3">
+                  <div className="text-sm font-semibold">Meet tutors</div>
+                  <div className="text-xs text-slate-500">See video intros & ratings</div>
+                </div>
+              </div>
+
+              {/* Lower-right card - lifted up and pulled inwards */}
+              <div className="absolute -right-6 bottom-36 w-64 rounded-xl overflow-hidden shadow-lg border-2 border-white bg-white">
+                <div className="p-4">
+                  <div className="text-lg font-bold">Practice </div>
+                  <div className="text-xs text-slate-500 mt-2">Short tasks to try between lessons</div>
+                </div>
+                <img loading="lazy" src={cardImage3} alt="mini lesson" className="w-full h-20 object-cover" />
+              </div>
+
             </motion.div>
           </div>
         </div>
@@ -274,7 +272,7 @@ export default function LandingPageAlt() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-3xl font-serif">Why learners love LinguaNest</h3>
+              <h3 className="text-3xl font-serif">Why learners love HIREGENIUS</h3>
               <p className="mt-4 text-slate-600 max-w-xl">Short lessons, lots of speaking time and tutors focused on practical outcomes. Learn phrases you’ll use the very next day.</p>
 
               <div className="mt-8 grid sm:grid-cols-3 gap-4">
@@ -302,7 +300,7 @@ export default function LandingPageAlt() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white p-4 rounded-xl shadow">Quick lessons</div>
-                <div className="bg-white p-4 rounded-xl shadow">Audio practice</div>
+                <div className="bg-white p-4 rounded-xl shadow">Excellent Material</div>
               </div>
             </div>
           </div>
@@ -365,7 +363,7 @@ export default function LandingPageAlt() {
           <h4 className="text-2xl font-semibold">Start speaking confidently</h4>
           <p className="text-slate-600 mt-2">Sign up now and claim your free trial lesson. Get personalized recommendations and a 7-day plan after your first session.</p>
           <div className="mt-6 flex justify-center gap-4">
-            <Link to="/trainers" className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-[#0ea5a3] text-white">Browse trainers <ChevronRight /></Link>
+            <Link to="/main" className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-[#0ea5a3] text-white">Browse trainers <ChevronRight /></Link>
             <Link to="/register" className="inline-flex items-center gap-3 px-6 py-3 rounded-lg border border-[#0ea5a3] text-[#0ea5a3]">Become a trainer</Link>
           </div>
         </div>
@@ -401,11 +399,7 @@ export default function LandingPageAlt() {
 
           <div>
             <div className="font-semibold">Stay in touch</div>
-            <form className="mt-3 flex gap-2" onSubmit={(e) => e.preventDefault()}>
-              <label htmlFor="newsletter" className="sr-only">Email</label>
-              <input id="newsletter" type="email" placeholder="Your email" className="w-full px-3 py-2 rounded-lg text-slate-900" />
-              <button className="px-4 py-2 rounded-lg bg-[#0ea5a3] font-semibold">Sign</button>
-            </form>
+            
 
             <div className="mt-4 flex items-center gap-3 text-slate-300">
               <a href="#" aria-label="Facebook"><Facebook /></a>

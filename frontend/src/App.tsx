@@ -14,7 +14,7 @@ import EducatorDashboard from './pages/trainer/EducatorDashboard'
 import BookingPage from './pages/BookingPage'
 import SessionRoom from './pages/SessionRoom'
 import TrainerProfile from './pages/TrainerProfile'
-
+import Trainers from './pages/Trainers'
 function App() {
   return (
     <StripeProvider>
@@ -34,7 +34,7 @@ function App() {
                   <StudentDashboard />
                 </PrivateRoute>
               } />
-              
+              <Route path="/trainers" element={<Trainers />} /> 
               <Route path="/trainer/*" element={
                 <PrivateRoute allowedRoles={['trainer']}>
                   <EducatorDashboard />

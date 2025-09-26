@@ -1,66 +1,186 @@
-import React, { useState, useEffect } from 'react'
+// src/pages/BookingPage.jsx
+import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { User, Star, Clock, Globe, CreditCard, DollarSign, ArrowLeft, CheckCircle, Shield, Lock, Receipt } from 'lucide-react'
+import {
+  User,
+  Star,
+  Clock,
+  Globe,
+  CreditCard,
+  DollarSign,
+  ArrowLeft,
+  CheckCircle,
+  Shield,
+  Lock,
+  Receipt,
+} from 'lucide-react'
 import { loadStripe } from '@stripe/stripe-js'
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import {
+  Elements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js'
 import axios from 'axios'
 import { useAuth } from '../contexts/AuthContext'
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51S23EsEiAibFBvoAcRhsYQj1fNiqfWKTJqrMgHlf76AjyFOyM81AU3DSqgboUKpIdClQmcMIEhUMOtOeYiz4eX4v00JEPCpKeA')
+const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
+    'pk_test_51S23EsEiAibFBvoAcRhsYQj1fNiqfWKTJqrMgHlf76AjyFOyM81AU3DSqgboUKpIdClQmcMIEhUMOtOeYiz4eX4v00JEPCpKeA'
+)
 
-const PaymentForm = ({ trainer, onPaymentSuccess, onPaymentError }) => {
+/* ------------------ Injected CSS ------------------ */
+const INJECTED_CSS = `
+:root{
+  --brand-teal: #0ea5a3;
+  --teal-mid: #6ee7b7;
+  --dark-teal: #0b766a;
+  --accent-orange: #f97316;
+  --coral-deep: #ff6b35;
+  --bg-pale-top: #f8fbff;
+  --bg-pale: #f6faf9;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --text: #0f172a;
+  --danger: #ef4444;
+}
+*{box-sizing:border-box}
+body,html,#root{margin:0;padding:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:var(--text);background:linear-gradient(180deg,var(--bg-pale-top),var(--bg-pale));}
+.container{max-width:1100px;margin:0 auto;padding:28px}
+.header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.logo-box{width:64px;height:64px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand-teal),var(--teal-mid));color:#fff;box-shadow:0 8px 30px rgba(14,165,163,0.12)}
+.app-title{font-size:20px;font-weight:700}
+.app-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.grid-2{display:grid;grid-template-columns:1fr 420px;gap:28px}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+.avatar{width:76px;height:76px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand-teal),var(--teal-mid));color:#fff;box-shadow:0 12px 30px rgba(14,165,163,0.12)}
+.section-title{font-size:18px;font-weight:700;margin-bottom:12px}
+.small-muted{color:var(--muted);font-size:13px}
+.info-list{list-style:none;padding:0;margin:0}
+.info-list li{display:flex;gap:10px;align-items:center;margin-bottom:10px;color:var(--muted)}
+.stat-row{display:flex;gap:12px;align-items:center}
+.method-group{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+.method-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;border:1px solid rgba(15,23,42,0.05);cursor:pointer;background:transparent;transition:all .18s}
+.method-item:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(2,6,23,0.04)}
+.method-item.active{border:2px solid var(--dark-teal);box-shadow:0 12px 30px rgba(11,118,106,0.12);background:linear-gradient(180deg,rgba(11,118,106,0.02),rgba(14,165,163,0.01))}
+.method-icon{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:#fff;box-shadow:0 8px 18px rgba(2,6,23,0.04)}
+.method-label{font-weight:700}
+.method-sub{font-size:13px;color:var(--muted)}
+.right-card{padding:18px;border-radius:12px}
+.card{background:var(--card);border-radius:14px;border:1px solid rgba(15,23,42,0.04);box-shadow:0 18px 40px rgba(2,6,23,0.06);padding:20px}
+.card-compact{padding:16px}
+.card-logos{display:flex;gap:8px;align-items:center}
+.stripe-field{padding:12px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);margin-bottom:12px;background:linear-gradient(180deg,#fff,#fcfffb);position:relative}
+.label{display:block;font-weight:600;color:var(--muted);margin-bottom:8px;font-size:13px}
+.input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);background:var(--card);font-size:14px;outline:none}
+.btn-primary{background:var(--accent-orange);color:#fff;padding:12px;border-radius:10px;border:none;font-weight:800;cursor:pointer}
+.btn-secondary{background:var(--brand-teal);color:#fff;padding:10px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+.helper{font-size:13px;color:var(--muted)}
+.alert{display:flex;gap:10px;align-items:center;border-radius:10px;padding:10px 12px;background:#fff7f7;color:var(--danger);border:1px solid rgba(239,68,68,0.08);font-weight:600}
+.footer-note{margin-top:14px;font-size:13px;color:var(--muted)}
+.card-brand { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display:flex; align-items:center; justify-content:center; width:44px; height:28px; pointer-events:none; }
+.card-brand img { max-height:22px; max-width:44px; display:block; }
+.amex-badge { background:#003876; color:#fff; font-weight:700; font-size:12px; padding:2px 6px; border-radius:4px; }
+.split-row { display:flex; gap:12px; align-items:center; }
+@media (max-width:640px) {.logo-box{width:56px;height:56px}}
+`;
+
+/* inject style once */
+const injectCssOnce = () => {
+  if (document.getElementById('booking-page-styles')) return
+  const s = document.createElement('style')
+  s.id = 'booking-page-styles'
+  s.innerHTML = INJECTED_CSS
+  document.head.appendChild(s)
+}
+
+/* brand mounting helper */
+const mountBrandToContainer = (containerId, brand) => {
+  const container = document.getElementById(containerId)
+  if (!container) return
+  container.innerHTML = ''
+  if (!brand || brand === 'unknown') return
+  const visa = 'https://js.stripe.com/v3/fingerprinted/img/visa-729c05c240c4bdb47b03ac81d9945bfe.svg'
+  const mc = 'https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg'
+  const discover = 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Discover_Card_logo.svg'
+  if (brand === 'visa') {
+    const img = document.createElement('img'); img.src = visa; img.alt = 'visa'; img.style.maxHeight = '20px'; container.appendChild(img); return
+  }
+  if (brand === 'mastercard' || brand === 'maestro') {
+    const img = document.createElement('img'); img.src = mc; img.alt = 'mc'; img.style.maxHeight = '20px'; container.appendChild(img); return
+  }
+  if (brand === 'amex') {
+    const b = document.createElement('div'); b.className = 'amex-badge'; b.textContent = 'AMEX'; container.appendChild(b); return
+  }
+  if (brand === 'discover') {
+    const img = document.createElement('img'); img.src = discover; img.alt = 'discover'; img.style.maxHeight = '20px'; container.appendChild(img); return
+  }
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svg.setAttribute('width', '18'); svg.setAttribute('height', '18'); svg.setAttribute('viewBox', '0 0 24 24')
+  svg.innerHTML = '<path fill="#0f172a" d="M2 7h20v10H2z" opacity="0.12"></path><rect x="3" y="8" width="18" height="2" rx="1" fill="#0f172a" />'
+  container.appendChild(svg)
+}
+
+/* ---------------- PaymentPanel (right) - uses separate Stripe elements ---------------- */
+const PaymentPanel = ({ trainer, selectedMethod, onPaymentSuccess, onPaymentError }) => {
   const stripe = useStripe()
   const elements = useElements()
   const [loading, setLoading] = useState(false)
   const [studentName, setStudentName] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('stripe')
   const [cardError, setCardError] = useState('')
 
-  const handleCardChange = (event) => {
-    if (event.error) {
-      setCardError(event.error.message)
-    } else {
-      setCardError('')
-    }
+  useEffect(() => {
+    injectCssOnce()
+  }, [])
+
+  // invoked by CardNumberElement's onChange
+  const handleCardNumberChange = (ev) => {
+    setCardError(ev?.error ? ev.error.message : '')
+    mountBrandToContainer('card-brand-container', ev?.brand || 'unknown')
   }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    
+  // optional: handle expiry / cvc errors (show aggregated)
+  const handleGenericChange = (ev) => {
+    if (ev?.error) setCardError(ev.error.message)
+    else if (!ev?.error) setCardError('')
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     if (!studentName.trim()) {
       onPaymentError('Please enter your name')
       return
     }
-
     setLoading(true)
 
     try {
-      if (paymentMethod === 'stripe') {
+      if (selectedMethod === 'card') {
         if (!stripe || !elements) {
           onPaymentError('Stripe not loaded')
+          setLoading(false)
           return
         }
 
-        const cardElement = elements.getElement(CardElement)
-        
-        if (!cardElement) {
-          onPaymentError('Card element not found')
+        const cardNumberEl = elements.getElement(CardNumberElement)
+        if (!cardNumberEl) {
+          onPaymentError('Card number field missing')
+          setLoading(false)
           return
         }
 
-        // Create payment intent
+        // Create payment intent (kept same as original: amount not multiplied)
         const { data } = await axios.post('/api/payments/create-payment-intent', {
           amount: trainer.profile?.hourlyRate || 25,
           currency: 'usd'
         })
 
-        // Confirm payment
+        // Confirm payment using the CardNumberElement as card
         const result = await stripe.confirmCardPayment(data.clientSecret, {
           payment_method: {
-            card: cardElement,
-            billing_details: {
-              name: studentName,
-            },
+            card: cardNumberEl,
+            billing_details: { name: studentName }
           }
         })
 
@@ -92,7 +212,7 @@ const PaymentForm = ({ trainer, onPaymentSuccess, onPaymentError }) => {
           })
         }
       } else {
-        // Fake payment
+        // Demo flow: call fake-payment endpoint (keeps your original flow)
         const fakePaymentResponse = await axios.post('/api/payments/fake-payment', {
           amount: trainer.profile?.hourlyRate || 25
         })
@@ -121,165 +241,117 @@ const PaymentForm = ({ trainer, onPaymentSuccess, onPaymentError }) => {
           }
         })
       }
-    } catch (error) {
-      console.error('Payment error:', error)
-      onPaymentError(error.response?.data?.message || 'Payment failed')
+    } catch (err) {
+      console.error('Payment error:', err)
+      onPaymentError(err?.response?.data?.message || 'Payment failed')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-green-light to-cream-light p-6 rounded-2xl">
-        <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-          <Shield className="h-6 w-6 mr-2 text-accent" />
-          Secure Payment
-        </h3>
-        <p className="text-gray-600">Your payment information is encrypted and secure</p>
-      </div>
+    <div className="right-card card">
+      <form onSubmit={handleSubmit}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div>
+            <div className="section-title">{selectedMethod === 'card' ? 'Card Payment' : 'Demo Payment'}</div>
+            <div className="small-muted">
+              {selectedMethod === 'card'
+                ? 'Enter your card details'
+                : 'Complete a demo payment (no charge)'}
+            </div>
+          </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="studentName" className="block text-sm font-semibold text-gray-700 mb-3">
-            Your Full Name *
-          </label>
-          <input
-            type="text"
-            id="studentName"
-            value={studentName}
-            onChange={(e) => setStudentName(e.target.value)}
-            className="input-field"
-            placeholder="Enter your full name"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-4">
-            Choose Payment Method
-          </label>
-          <div className="space-y-4">
-            <label className="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-accent hover:bg-accent hover:bg-opacity-5 transition-all duration-300">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="stripe"
-                checked={paymentMethod === 'stripe'}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                className="h-5 w-5 text-accent focus:ring-accent border-gray-300"
-              />
-              <div className="ml-4 flex items-center">
-                <CreditCard className="h-6 w-6 text-accent mr-3" />
-                <div>
-                  <span className="font-semibold text-gray-900">Credit/Debit Card</span>
-                  <div className="text-sm text-gray-600">Secure payment via Stripe</div>
-                </div>
-              </div>
-              <div className="ml-auto flex items-center space-x-2">
-                <img src="https://js.stripe.com/v3/fingerprinted/img/visa-729c05c240c4bdb47b03ac81d9945bfe.svg" alt="Visa" className="h-6" />
-                <img src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="Mastercard" className="h-6" />
-              </div>
-            </label>
-
-            <label className="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-accent hover:bg-accent hover:bg-opacity-5 transition-all duration-300">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="fake"
-                checked={paymentMethod === 'fake'}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                className="h-5 w-5 text-accent focus:ring-accent border-gray-300"
-              />
-              <div className="ml-4 flex items-center">
-                <DollarSign className="h-6 w-6 text-green mr-3" />
-                <div>
-                  <span className="font-semibold text-gray-900">Demo Payment</span>
-                  <div className="text-sm text-gray-600">For testing purposes only</div>
-                </div>
-              </div>
-            </label>
+          <div style={{ textAlign: 'right' }}>
+            <div className="small-muted">Total</div>
+            <div style={{ fontWeight: 800, fontSize: 20, color: 'var(--brand-teal)' }}>
+              ${trainer.profile?.hourlyRate || 25}
+            </div>
           </div>
         </div>
 
-        {paymentMethod === 'stripe' && (
-          <div className="space-y-4">
-            <label className="block text-sm font-semibold text-gray-700">
-              Card Details
-            </label>
-            <div className="p-4 border-2 border-gray-200 rounded-xl focus-within:border-accent transition-all duration-300">
-              <CardElement
+        <label className="label">Your Full Name</label>
+        <input className="input" value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="John Doe" />
+
+        {selectedMethod === 'card' && (
+          <div style={{ marginTop: 12 }}>
+            <div className="label">Card number</div>
+            <div className="stripe-field">
+              <CardNumberElement
                 options={{
-                  style: {
-                    base: {
-                      fontSize: '16px',
-                      color: '#374151',
-                      fontFamily: 'Inter, sans-serif',
-                      '::placeholder': {
-                        color: '#9CA3AF',
-                      },
-                    },
-                    invalid: {
-                      color: '#EF4444',
-                    },
-                  },
+                  placeholder: '1234 5678 9012 3456',
+                  style: { base: { fontSize: '15px', color: '#0f172a', '::placeholder': { color: '#9aa3ad' } } }
                 }}
-                onChange={handleCardChange}
+                onChange={handleCardNumberChange}
               />
+              <div id="card-brand-container" className="card-brand" aria-hidden />
             </div>
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <div className="label">Expiry</div>
+                <div className="stripe-field">
+                  <CardExpiryElement
+                    options={{
+                      placeholder: 'MM/YY',
+                      style: { base: { fontSize: '15px', color: '#0f172a', '::placeholder': { color: '#9aa3ad' } } }
+                    }}
+                    onChange={handleGenericChange}
+                  />
+                </div>
+              </div>
+
+              <div style={{ width: 140 }}>
+                <div className="label">CVC</div>
+                <div className="stripe-field">
+                  <CardCvcElement
+                    options={{
+                      placeholder: '3 digits',
+                      style: { base: { fontSize: '15px', color: '#0f172a', '::placeholder': { color: '#9aa3ad' } } }
+                    }}
+                    onChange={handleGenericChange}
+                  />
+                </div>
+              </div>
+            </div>
+
             {cardError && (
-              <div className="text-red-500 text-sm flex items-center">
-                <span className="mr-2">⚠️</span>
-                {cardError}
+              <div className="alert" style={{ marginTop: 10 }}>
+                <span>⚠️</span>
+                <div style={{ marginLeft: 8 }}>{cardError}</div>
               </div>
             )}
-            <div className="flex items-center text-sm text-gray-600">
-              <Lock className="h-4 w-4 mr-2" />
+
+            <div className="helper" style={{ marginTop: 10 }}>
+              <Lock style={{ verticalAlign: 'middle', marginRight: 8 }} />
               Your card information is encrypted and secure
             </div>
           </div>
         )}
 
-        <div className="bg-gradient-to-r from-accent to-coral-dark p-6 rounded-2xl text-white">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-lg font-semibold">Total Amount:</span>
-            <span className="text-3xl font-bold">
-              ${trainer.profile?.hourlyRate || 25}
-            </span>
+        {selectedMethod === 'demo' && (
+          <div style={{ marginTop: 12 }}>
+            <div className="card card-compact">
+              <div className="small-muted">Demo payment: no real charge will occur. Click complete to proceed.</div>
+            </div>
           </div>
-          <div className="flex items-center text-sm opacity-90">
-            <Receipt className="h-4 w-4 mr-2" />
-            One-time payment for language learning session
-          </div>
+        )}
+
+        <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
+          <button type="submit" disabled={loading || (selectedMethod === 'card' && !stripe)} className="btn-primary" style={{ flex: 1 }}>
+            {loading ? 'Processing…' : selectedMethod === 'card' ? `Pay $${trainer.profile?.hourlyRate || 25}` : `Complete Demo $${trainer.profile?.hourlyRate || 25}`}
+          </button>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading || (paymentMethod === 'stripe' && !stripe)}
-          className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg py-4"
-        >
-          {loading ? (
-            <div className="loading-dots">
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
-          ) : (
-            <>
-              <CheckCircle className="h-6 w-6 mr-3" />
-              {paymentMethod === 'stripe' 
-                ? `Pay $${trainer.profile?.hourlyRate || 25} with Stripe` 
-                : `Complete Demo Payment $${trainer.profile?.hourlyRate || 25}`
-              }
-            </>
-          )}
-        </button>
+        <div className="footer-note" style={{ marginTop: 12 }}>
+          By completing this payment you accept our <a className="link-accent">Terms</a>.
+        </div>
       </form>
     </div>
   )
 }
 
+/* ---------------- BookingPage (main) ---------------- */
 const BookingPage = () => {
   const { trainerId } = useParams()
   const navigate = useNavigate()
@@ -289,26 +361,30 @@ const BookingPage = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [booking, setBooking] = useState(null)
+  const [selectedMethod, setSelectedMethod] = useState('card') // 'card' or 'demo'
+
+  useEffect(() => {
+    injectCssOnce()
+  }, [])
 
   useEffect(() => {
     if (!user) {
       navigate('/login')
       return
     }
-
     if (user.role !== 'student') {
       navigate('/main')
       return
     }
-
     fetchTrainer()
+    // eslint-disable-next-line
   }, [trainerId, user, navigate])
 
   const fetchTrainer = async () => {
     try {
       const response = await axios.get(`/api/users/profile/${trainerId}`)
       setTrainer(response.data)
-    } catch (error) {
+    } catch (err) {
       setError('Failed to load trainer information')
     } finally {
       setLoading(false)
@@ -321,31 +397,24 @@ const BookingPage = () => {
     setError('')
   }
 
-  const handlePaymentError = (errorMessage) => {
-    setError(errorMessage)
+  const handlePaymentError = (msg) => {
+    setError(msg)
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-light to-cream-light">
-        <div className="loading-dots">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
+      <div style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
+        <div>Loading…</div>
       </div>
     )
   }
 
   if (!trainer) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-light to-cream-light">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Trainer not found</h2>
-          <Link to="/main" className="btn-primary">
-            Browse Trainers
-          </Link>
+      <div className="container">
+        <div className="card">
+          <h2 className="section-title">Trainer not found</h2>
+          <Link to="/main" className="btn-primary">Browse Trainers</Link>
         </div>
       </div>
     )
@@ -353,202 +422,190 @@ const BookingPage = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-light to-cream-light flex items-center justify-center">
-        <div className="max-w-md w-full mx-4">
-          <div className="card text-center animate-fade-scale">
-            <div className="w-20 h-20 bg-gradient-to-br from-green to-green-dark rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="h-10 w-10 text-white" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Payment Successful!</h2>
-            <p className="text-gray-600 mb-8 leading-relaxed">
-              Your session with <span className="font-semibold text-accent">{trainer.name}</span> has been booked successfully. 
-              The trainer will create a session and you'll be able to join via video call.
-            </p>
-            
-            <div className="bg-gradient-to-r from-green-light to-cream-light p-6 rounded-2xl mb-8">
-              <div className="text-sm text-gray-700 space-y-3">
-                <div className="flex justify-between items-center">
-                  <span>Trainer:</span>
-                  <span className="font-semibold">{trainer.name}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Amount Paid:</span>
-                  <span className="font-semibold text-accent">${booking?.amount}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Payment Method:</span>
-                  <span className="font-semibold capitalize">{booking?.paymentMethod}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Status:</span>
-                  <span className="font-semibold text-green">Confirmed</span>
-                </div>
-                {booking?.paymentDetails?.paymentId && (
-                  <div className="flex justify-between items-center">
-                    <span>Payment ID:</span>
-                    <span className="font-mono text-xs">{booking.paymentDetails.paymentId}</span>
-                  </div>
-                )}
-              </div>
-            </div>
+  <div className="container py-5">
+    <div
+      className="card text-center shadow-lg border-0"
+      style={{ maxWidth: 560, margin: "0 auto", borderRadius: 20 }}
+    >
+      {/* Success Icon */}
+      <div
+        className="d-flex align-items-center justify-content-center bg-light rounded-circle shadow-sm"
+        style={{ width: 96, height: 96, margin: "24px auto" }}
+      >
+        <CheckCircle size={48} strokeWidth={2.5} color="var(--brand-teal)" />
+      </div>
 
-            <div className="space-y-4">
-              <Link to="/student/sessions" className="block w-full btn-primary">
-                View My Sessions
-              </Link>
-              <Link to="/main" className="block w-full btn-secondary">
-                Book Another Session
-              </Link>
-            </div>
+      {/* Title & Subtitle */}
+      <h3 className="fw-bold mb-2">Payment Successful</h3>
+      <p className="text-muted mb-4">
+        Your session with{" "}
+        <strong style={{ color: "var(--brand-teal)" }}>{trainer.name}</strong>{" "}
+        has been booked successfully.
+      </p>
+
+      {/* Booking Summary Card */}
+      <div
+        className="card border-0 shadow-sm"
+        style={{ margin: "0 24px", borderRadius: 16 }}
+      >
+        <div className="card-body" style={{ padding: "20px" }}>
+          <div className="d-flex justify-content-between mb-2">
+            <span className="text-muted">Trainer</span>
+            <strong>{trainer.name}</strong>
+          </div>
+          <div className="d-flex justify-content-between mb-2">
+            <span className="text-muted">Amount</span>
+            <strong style={{ color: "var(--brand-teal)" }}>
+              ${booking?.amount}
+            </strong>
+          </div>
+          <div className="d-flex justify-content-between">
+            <span className="text-muted">Method</span>
+            <strong className="text-secondary">{booking?.paymentMethod}</strong>
           </div>
         </div>
       </div>
+
+      {/* Action Buttons */}
+      <div className="d-flex justify-content-center gap-3 my-4">
+        <Link to="/student/sessions" className="btn btn-primary px-4 py-2">
+          View My Sessions
+        </Link>
+        <Link
+          to="/main"
+          className="btn px-4 py-2"
+          style={{
+            background: "var(--brand-teal)",
+            color: "white",
+          }}
+        >
+          Book Another
+        </Link>
+      </div>
+    </div>
+  </div>
+
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-light to-cream-light">
-      {/* Header */}
-      <header className="bg-white bg-opacity-90 backdrop-blur-lg border-b border-white border-opacity-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <Link to="/" className="flex items-center">
-              <div className="w-10 h-10 bg-gradient-to-br from-accent to-coral rounded-xl flex items-center justify-center mr-3">
-                <Globe className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gradient">LinguaConnect</span>
-            </Link>
-            
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center text-gray-600 hover:text-accent transition-colors duration-300 font-medium"
-            >
-              <ArrowLeft className="h-5 w-5 mr-2" />
-              Back to Trainers
-            </button>
+    <div className="container">
+      <div className="header-row">
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div className="logo-box"><Globe /></div>
+          <div>
+            <div className="app-title">LinguaConnect</div>
+            <div className="app-sub">Secure checkout — choose your payment method</div>
           </div>
         </div>
-      </header>
+        <button onClick={() => navigate(-1)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer' }}>
+          <ArrowLeft /> Back
+        </button>
+      </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Trainer Information */}
-          <div className="space-y-8">
-            <div className="card animate-slide-up">
-              <div className="flex items-center mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-accent to-coral rounded-2xl flex items-center justify-center mr-6">
-                  <User className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-900">{trainer.name}</h2>
-                  <div className="flex items-center text-gray-600 mt-2">
-                    <Star className="h-5 w-5 text-yellow-400 mr-2" />
-                    <span className="font-semibold">{trainer.stats?.rating || 5.0}</span>
-                    <span className="ml-2">({Math.floor(Math.random() * 200) + 50} reviews)</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div className="flex items-center text-gray-600">
-                  <Globe className="h-5 w-5 mr-3 text-accent" />
-                  <div>
-                    <div className="font-semibold">Languages</div>
-                    <div className="text-sm">
-                      {trainer.profile?.trainerLanguages?.length > 0 
-                        ? trainer.profile.trainerLanguages.map(l => l.language).join(', ')
-                        : trainer.profile?.languages?.join(', ') || 'English, Spanish, French'
-                      }
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Clock className="h-5 w-5 mr-3 text-accent" />
-                  <div>
-                    <div className="font-semibold">Experience</div>
-                    <div className="text-sm">{trainer.profile?.experience || 5}+ years</div>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-gray-600 mb-8 leading-relaxed">
-                {trainer.profile?.bio || 'Experienced language trainer helping students achieve fluency through personalized lessons and engaging conversations.'}
-              </p>
-
-              <div className="bg-gradient-to-r from-accent to-coral-dark p-6 rounded-2xl text-white">
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-semibold">Session Rate:</span>
-                  <span className="text-3xl font-bold">
-                    ${trainer.profile?.hourlyRate || 25}/hour
-                  </span>
+      <div className="grid-2">
+        {/* LEFT: trainer + select payment type */}
+        <div>
+          <div className="card">
+            <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 12 }}>
+              <div className="avatar"><User /></div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 22 }}>{trainer.name}</h3>
+                <div style={{ marginTop: 6 }} className="stat-row">
+                  <Star style={{ color: '#fbbf24' }} />
+                  <strong>{trainer.stats?.rating || 5.0}</strong>
+                  <div className="small-muted">({Math.floor(Math.random() * 200) + 50} reviews)</div>
                 </div>
               </div>
             </div>
 
-            {/* What's Included */}
-            <div className="card animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">What's Included</h3>
-              <ul className="space-y-4 text-gray-600">
-                {[
-                  'One-on-one personalized session',
-                  'HD video call via Jitsi Meet',
-                  'Customized learning materials',
-                  'Real-time feedback and corrections',
-                  'Session recording (if requested)'
-                ].map((item, index) => (
-                  <li key={index} className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green mr-3" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+              <div>
+                <div className="small-muted" style={{ fontWeight: 700 }}>Languages</div>
+                <div className="small-muted">
+                  {trainer.profile?.trainerLanguages?.length > 0
+                    ? trainer.profile.trainerLanguages.map((l) => l.language).join(', ')
+                    : trainer.profile?.languages?.join(', ') || 'English'}
+                </div>
+              </div>
+              <div>
+                <div className="small-muted" style={{ fontWeight: 700 }}>Experience</div>
+                <div className="small-muted">{trainer.profile?.experience || 5}+ years</div>
+              </div>
+            </div>
+
+            <p className="small-muted">{trainer.profile?.bio || 'Experienced language trainer helping students achieve fluency.'}</p>
+
+            <div className="card" style={{ marginTop: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontWeight: 700 }}>Session Rate</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--accent-orange)' }}>${trainer.profile?.hourlyRate || 25}/hour</div>
+              </div>
             </div>
           </div>
 
-          {/* Booking Form */}
-          <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            <div className="card">
-              <h3 className="text-2xl font-bold text-gray-900 mb-8">Book Your Session</h3>
-              
-              {error && (
-                <div className="bg-red-50 border-2 border-red-200 text-red-700 px-6 py-4 rounded-2xl mb-8 animate-fade-scale">
-                  <div className="flex items-center">
-                    <span className="mr-2">⚠️</span>
-                    {error}
-                  </div>
+          {/* separate Select Payment Type card (left) */}
+          <div className="card" style={{ marginTop: 14 }}>
+            <h4 className="section-title">Select payment type</h4>
+            <div className="method-group">
+              <div className={`method-item ${selectedMethod === 'card' ? 'active' : ''}`} onClick={() => setSelectedMethod('card')}>
+                <div className="method-icon"><CreditCard /></div>
+                <div style={{ flex: 1 }}>
+                  <div className="method-label">Credit / Debit Card</div>
+                  <div className="method-sub">Pay securely with any major card</div>
                 </div>
-              )}
+                <div className="card-logos">
+                  <img src="https://js.stripe.com/v3/fingerprinted/img/visa-729c05c240c4bdb47b03ac81d9945bfe.svg" alt="visa" style={{ height: 20 }} />
+                  <img src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="mc" style={{ height: 20 }} />
+                </div>
+              </div>
 
-              <Elements stripe={stripePromise}>
-                <PaymentForm
-                  trainer={trainer}
-                  onPaymentSuccess={handlePaymentSuccess}
-                  onPaymentError={handlePaymentError}
-                />
-              </Elements>
-
-              <div className="mt-8 p-6 bg-gradient-to-r from-green-light to-cream-light rounded-2xl">
-                <h4 className="font-bold text-gray-900 mb-4">How it works:</h4>
-                <ol className="text-sm text-gray-700 space-y-2">
-                  <li className="flex items-center">
-                    <span className="w-6 h-6 bg-accent text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">1</span>
-                    Complete payment to book your session
-                  </li>
-                  <li className="flex items-center">
-                    <span className="w-6 h-6 bg-accent text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">2</span>
-                    Your trainer will create a session and send you the details
-                  </li>
-                  <li className="flex items-center">
-                    <span className="w-6 h-6 bg-accent text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">3</span>
-                    Join the video call at the scheduled time
-                  </li>
-                  <li className="flex items-center">
-                    <span className="w-6 h-6 bg-accent text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">4</span>
-                    Enjoy your personalized language learning experience!
-                  </li>
-                </ol>
+              <div className={`method-item ${selectedMethod === 'demo' ? 'active' : ''}`} onClick={() => setSelectedMethod('demo')}>
+                <div className="method-icon"><DollarSign /></div>
+                <div style={{ flex: 1 }}>
+                  <div className="method-label">Demo Payment</div>
+                  <div className="method-sub">Testing flow — no real charge</div>
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* what's included */}
+          <div className="card" style={{ marginTop: 14 }}>
+            <h4 className="section-title">What's Included</h4>
+            <ul className="info-list">
+              {[
+                'One-on-one personalized session',
+                'HD video call via Jitsi Meet',
+                'Customized materials',
+                'Real-time feedback',
+                'Session recording (if requested)',
+              ].map((i, idx) => (
+                <li key={idx}><CheckCircle /> <span style={{ marginLeft: 8 }}>{i}</span></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* RIGHT: payment panel */}
+        <div>
+          <div className="card">
+            <h3 className="section-title">Payment</h3>
+            {error && (
+              <div className="alert" style={{ marginBottom: 12 }}>
+                <span>⚠️</span>
+                <div style={{ marginLeft: 8 }}>{error}</div>
+              </div>
+            )}
+
+            <Elements stripe={stripePromise}>
+              <PaymentPanel
+                trainer={trainer}
+                selectedMethod={selectedMethod}
+                onPaymentSuccess={handlePaymentSuccess}
+                onPaymentError={handlePaymentError}
+              />
+            </Elements>
           </div>
         </div>
       </div>

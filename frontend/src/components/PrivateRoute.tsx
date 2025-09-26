@@ -12,23 +12,20 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles = []
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-soft-green via-cream to-soft-coral flex items-center justify-center">
-        <div className="loading-dots">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading-dots" aria-hidden>
+          <div></div><div></div><div></div><div></div>
         </div>
       </div>
     )
   }
 
   if (!user) {
-    return <Navigate to="/login" />
+    return <Navigate to="/login" replace />
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" />
+    return <Navigate to="/login" replace />
   }
 
   return <>{children}</>

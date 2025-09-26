@@ -16,7 +16,7 @@ router.post('/', authenticate, async (req, res) => {
       studentName,
       paymentMethod,
       amount
-    });
+    }); 
 
     await booking.save();
     await booking.populate(['student', 'trainer']);
