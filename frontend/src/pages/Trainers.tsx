@@ -14,6 +14,7 @@ import {
   Heart
 } from 'lucide-react'
 import axios from 'axios'
+import { motion } from 'framer-motion'
 
 /** Trainer types: demoVideo optional */
 interface Trainer {
@@ -260,10 +261,34 @@ const Trainer: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3">
             <Link to="/" className="flex items-center">
-              <div className="w-10 h-10 bg-[var(--brand-teal)] rounded-lg flex items-center justify-center mr-3 transform hover:scale-105 transition-transform duration-300">
-                <Globe className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-xl font-semibold text-[var(--brand-teal)]">LinguaConnect</span>
+              <div className="text-2xl md:text-3xl font-[Good Vibes] font-extrabold tracking-wide relative inline-flex items-center">
+    {/* LEARN */}
+    <span className="bg-gradient-to-r from-black via-gray-800 to-gray-700 bg-clip-text text-transparent drop-shadow-lg">
+      LEARN
+    </span>
+
+    {/* Rotating Globe */}
+    <motion.span
+      animate={{ rotate: 360 }}
+      transition={{ repeat: Infinity, duration: 12, ease: "linear" }}
+      className="inline-block mx-1 text-3xl"
+    >
+      🌎
+    </motion.span>
+
+    {/* SPHERE */}
+    <span className="bg-gradient-to-r from-black via-gray-800 to-gray-700 bg-clip-text text-transparent drop-shadow-lg">
+      SPHERE
+    </span>
+
+    {/* Optional subtle shine */}
+    <motion.div
+      className="absolute top-0 left-0 w-full h-full bg-white/20 rounded-full blur-xl pointer-events-none"
+      animate={{ x: [-200, 200] }}
+      transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+    />
+  </div>
+
             </Link>
           </div>
         </div>

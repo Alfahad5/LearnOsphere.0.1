@@ -158,10 +158,10 @@ const TrainerProfile: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link to="/" className="flex items-center">
-              <div className="w-10 h-10 bg-[var(--brand-teal)] rounded-md flex items-center justify-center mr-2 hover:scale-105 transform transition">
-                <Globe className="h-5 w-5 text-white" />
+              <div>
+                <div className="text-lg font-semibold">LEARN🌎SPHERE</div>
+                <div className="text-xs text-slate-500 -mt-1">Live lessons · Micro-courses</div>
               </div>
-              <span className="text-2xl font-bold text-[var(--brand-teal)]">LinguaConnect</span>
             </Link>
             <Link
               to="/main"

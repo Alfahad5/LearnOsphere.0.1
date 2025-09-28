@@ -1,5 +1,5 @@
-// src/pages/StudentDashboard.jsx
-import React, { useState, useEffect } from 'react'
+// src/pages/StudentDashboard.tsx
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import {
   Home, BookOpen, User, Calendar, Star, Clock,
@@ -8,8 +8,20 @@ import {
 import { useAuth } from '../../contexts/AuthContext'
 import axios from 'axios'
 
-// Lightweight UI building blocks used by the requested Home screen
-const ServiceCard = ({ icon, bg = 'bg-emerald-500', title, desc, color = 'text-emerald-600' }) => (
+/* ---------------------------
+   Notes:
+   - Converted to TypeScript (tsx)
+   - UI/layout follows EducatorDashboard pattern (sidebar, top bar, content area)
+   - Kept all original logic intact (API calls, handlers, modals, validations)
+   - Preserved original color palette (primary teal: #0ea5a3)
+   - Minor TS typing added for clarity, without altering behavior
+   --------------------------- */
+
+/* ---------- Types ---------- */
+type AnyObj = Record<string, any>
+
+/* Lightweight UI building blocks used by the requested Home screen */
+const ServiceCard: React.FC<{ icon: React.ReactNode; bg?: string; title: string; desc: string; color?: string }> = ({ icon, bg = 'bg-emerald-500', title, desc, color = 'text-emerald-600' }) => (
   <div className="p-4 rounded-xl shadow-sm bg-white/90 border border-white/20">
     <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${bg}`}>
       {icon}
@@ -19,7 +31,7 @@ const ServiceCard = ({ icon, bg = 'bg-emerald-500', title, desc, color = 'text-e
   </div>
 )
 
-const FeatureCard = ({ icon, title, desc, btnText, btnColor = 'bg-emerald-500 hover:bg-emerald-600' }) => (
+const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; desc: string; btnText: React.ReactNode; btnColor?: string }> = ({ icon, title, desc, btnText, btnColor = 'bg-emerald-500 hover:bg-emerald-600' }) => (
   <div className="p-6 rounded-2xl bg-white/90 border border-white/20 shadow-sm flex flex-col justify-between">
     <div>
       <div className="mb-4">{icon}</div>
@@ -33,15 +45,15 @@ const FeatureCard = ({ icon, title, desc, btnText, btnColor = 'bg-emerald-500 ho
 )
 
 /* ---------------- StudentHome ---------------- */
-const StudentHome = () => {
-  const { user } = useAuth()
+const StudentHome: React.FC = () => {
+  const { user } = useAuth() as AnyObj
   const [stats, setStats] = useState({
     totalSessions: 0,
     upcomingSessions: 0,
     completedSessions: 0,
     totalSpent: 0
   })
-  const [recentSessions, setRecentSessions] = useState([])
+  const [recentSessions, setRecentSessions] = useState<AnyObj[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -61,9 +73,9 @@ const StudentHome = () => {
 
       setStats({
         totalSessions: sessions.length,
-        upcomingSessions: sessions.filter(s => s.status === 'scheduled').length,
-        completedSessions: sessions.filter(s => s.status === 'completed').length,
-        totalSpent: bookings.reduce((sum, b) => sum + (b.amount || 0), 0)
+        upcomingSessions: sessions.filter((s: AnyObj) => s.status === 'scheduled').length,
+        completedSessions: sessions.filter((s: AnyObj) => s.status === 'completed').length,
+        totalSpent: bookings.reduce((sum: number, b: AnyObj) => sum + (b.amount || 0), 0)
       })
 
       setRecentSessions(sessions.slice(0, 3))
@@ -87,71 +99,69 @@ const StudentHome = () => {
   return (
     <div className="space-y-6 max-w-[1200px] mx-auto">
       {/* Welcome Section */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20">
+      <div className="glass-effect rounded-2xl p-6 shadow-xl">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 bg-[#0ea5a3] rounded-lg flex items-center justify-center">
             <TrendingUp className="h-5 w-5 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-slate-900">Welcome back, {user?.name || 'student'}!</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Welcome back, {user?.name || 'student'}!</h2>
         </div>
-        <p className="text-slate-600 font-medium">Continue your language learning journey</p>
+        <p className="text-gray-600 font-medium">Continue your language learning journey</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white/80 backdrop-blur-xl rounded-xl p-4 shadow-lg border border-white/20 text-center hover:shadow-xl transition-all duration-300">
+        <div className="glass-effect rounded-xl p-4 shadow-xl text-center">
           <div className="w-10 h-10 bg-[#0ea5a3] rounded-xl flex items-center justify-center mx-auto mb-3">
             <BookOpen className="h-5 w-5 text-white" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 mb-1">{stats.totalSessions}</div>
-          <div className="text-slate-600 text-sm font-medium">Total Sessions</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">{stats.totalSessions}</div>
+          <div className="text-gray-600 text-sm font-medium">Total Sessions</div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-xl rounded-xl p-4 shadow-lg border border-white/20 text-center hover:shadow-xl transition-all duration-300">
+        <div className="glass-effect rounded-xl p-4 shadow-xl text-center">
           <div className="w-10 h-10 bg-[#6ee7b7] rounded-xl flex items-center justify-center mx-auto mb-3">
             <Calendar className="h-5 w-5 text-white" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 mb-1">{stats.upcomingSessions}</div>
-          <div className="text-slate-600 text-sm font-medium">Upcoming</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">{stats.upcomingSessions}</div>
+          <div className="text-gray-600 text-sm font-medium">Upcoming</div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-xl rounded-xl p-4 shadow-lg border border-white/20 text-center hover:shadow-xl transition-all duration-300">
+        <div className="glass-effect rounded-xl p-4 shadow-xl text-center">
           <div className="w-10 h-10 bg-[#f97316] rounded-xl flex items-center justify-center mx-auto mb-3">
             <Star className="h-5 w-5 text-white" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 mb-1">{stats.completedSessions}</div>
-          <div className="text-slate-600 text-sm font-medium">Completed</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">{stats.completedSessions}</div>
+          <div className="text-gray-600 text-sm font-medium">Completed</div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-xl rounded-xl p-4 shadow-lg border border-white/20 text-center hover:shadow-xl transition-all duration-300">
+        <div className="glass-effect rounded-xl p-4 shadow-xl text-center">
           <div className="w-10 h-10 bg-[#0ea5a3] rounded-xl flex items-center justify-center mx-auto mb-3">
             <Globe className="h-5 w-5 text-white" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 mb-1">${stats.totalSpent}</div>
-          <div className="text-slate-600 text-sm font-medium">Total Spent</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">${stats.totalSpent}</div>
+          <div className="text-gray-600 text-sm font-medium">Total Spent</div>
         </div>
       </div>
 
       {/* Recent Sessions */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20">
+      <div className="glass-effect rounded-2xl p-6 shadow-xl">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-bold text-slate-900">Recent Sessions</h3>
-          <Link to="/student/sessions" className="px-4 py-2 bg-[#0ea5a3] text-white rounded-lg hover:bg-[#0ea5a3]/90 text-sm font-semibold transition-all duration-300">
-            View All
-          </Link>
+          <h3 className="text-2xl font-bold text-gray-900">Recent Sessions</h3>
+          <Link to="/student/sessions" className="text-accent hover:text-accent-dark font-medium">View All</Link>
         </div>
 
         {recentSessions.length > 0 ? (
           <div className="space-y-3">
-            {recentSessions.map((session) => (
-              <div key={session._id || session.id} className="p-4 bg-white/60 backdrop-blur-sm rounded-xl flex items-center justify-between border border-white/30 hover:shadow-md transition-all duration-300">
+            {recentSessions.map((session: AnyObj) => (
+              <div key={session._id || session.id} className="p-4 bg-white bg-opacity-50 rounded-xl flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-[#0ea5a3] rounded-xl flex items-center justify-center mr-3">
                     <User className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <div className="font-bold text-slate-900">{session.title}</div>
-                    <div className="text-slate-600 text-sm font-medium">with {session.trainer?.name}</div>
+                    <div className="font-bold text-gray-900">{session.title}</div>
+                    <div className="text-gray-600 text-sm font-medium">with {session.trainer?.name}</div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -171,9 +181,9 @@ const StudentHome = () => {
             <div className="w-16 h-16 bg-[#0ea5a3]/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <BookOpen className="h-8 w-8 text-[#0ea5a3]" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">No sessions yet</h3>
-            <p className="text-slate-600 mb-4 font-medium">Start your learning journey today</p>
-            <Link to="/main" className="inline-flex items-center gap-2 px-4 py-2 bg-[#0ea5a3] text-white rounded-lg hover:shadow-lg font-semibold transition-all duration-300">Book Your First Session</Link>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No sessions yet</h3>
+            <p className="text-gray-600 mb-4 font-medium">Start your learning journey today</p>
+            <Link to="/main" className="inline-flex items-center gap-2 px-4 py-2 bg-[#0ea5a3] text-white rounded-lg hover:shadow-lg font-semibold">Book Your First Session</Link>
           </div>
         )}
       </div>
@@ -182,11 +192,11 @@ const StudentHome = () => {
 }
 
 /* ---------------- StudentSessions ---------------- */
-const StudentSessions = () => {
-  const [sessions, setSessions] = useState([])
+const StudentSessions: React.FC = () => {
+  const [sessions, setSessions] = useState<AnyObj[]>([])
   const [loading, setLoading] = useState(true)
   const [showReviewModal, setShowReviewModal] = useState(false)
-  const [selectedSession, setSelectedSession] = useState(null)
+  const [selectedSession, setSelectedSession] = useState<AnyObj | null>(null)
   const [reviewData, setReviewData] = useState({ rating: 5, comment: '' })
   const [submittingReview, setSubmittingReview] = useState(false)
   const [reviewSuccess, setReviewSuccess] = useState('')
@@ -209,7 +219,7 @@ const StudentSessions = () => {
   }
 
   // Helper to extract a trainer id robustly from session object
-  const getTrainerIdFromSession = (session) => {
+  const getTrainerIdFromSession = (session: AnyObj | null) => {
     if (!session) return null
     const trainer = session.trainer || session.trainerId || session.trainerObj
     if (!trainer) return null
@@ -217,9 +227,8 @@ const StudentSessions = () => {
   }
 
   // Helper to extract booking id robustly
-  const getBookingIdFromSession = (session) => {
+  const getBookingIdFromSession = (session: AnyObj | null) => {
     if (!session) return null
-    // common shapes: session.bookings = [{ _id }], session.bookingId, session.booking._id
     if (Array.isArray(session.bookings) && session.bookings.length > 0) {
       return session.bookings[0]._id || session.bookings[0].id || null
     }
@@ -229,7 +238,7 @@ const StudentSessions = () => {
     return session.bookingId || session.booking_id || null
   }
 
-  const handleReviewSubmit = async (e) => {
+  const handleReviewSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!selectedSession) return
     setSubmittingReview(true)
@@ -240,7 +249,6 @@ const StudentSessions = () => {
       const trainerId = getTrainerIdFromSession(selectedSession)
       const bookingId = getBookingIdFromSession(selectedSession)
 
-      // Basic validation - keep your logic intact but give helpful error if essential ids are missing
       if (!trainerId) {
         throw new Error('Trainer ID not found on session')
       }
@@ -258,11 +266,9 @@ const StudentSessions = () => {
       setReviewSuccess('Review submitted successfully')
       setShowReviewModal(false)
       setReviewData({ rating: 5, comment: '' })
-      // refresh sessions so UI updates (keeps same logic as before)
       fetchSessions()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to submit review:', error)
-      // If error.response?.data?.message exists, show it
       setReviewError(error?.response?.data?.message || error.message || 'Failed to submit review')
     } finally {
       setSubmittingReview(false)
@@ -281,8 +287,8 @@ const StudentSessions = () => {
 
   return (
     <div className="space-y-6 max-w-[1200px] mx-auto">
-      <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-white/20">
-        <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-4">My Sessions</h2>
+      <div className="glass-effect rounded-2xl p-5 shadow-xl">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">My Sessions</h2>
 
         {reviewSuccess && <div className="mb-4 text-sm text-green-700 font-medium">{reviewSuccess}</div>}
         {reviewError && <div className="mb-4 text-sm text-red-700 font-medium">{reviewError}</div>}
@@ -290,7 +296,7 @@ const StudentSessions = () => {
         {sessions.length > 0 ? (
           <div className="space-y-3">
             {sessions.map((session) => (
-              <div key={session._id || session.id} className="p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-white/25 hover:shadow-md transition-all duration-200">
+              <div key={session._id || session.id} className="p-4 bg-white bg-opacity-50 rounded-xl">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 bg-[#0ea5a3] rounded-lg flex items-center justify-center shrink-0">
@@ -298,9 +304,9 @@ const StudentSessions = () => {
                     </div>
 
                     <div className="min-w-0">
-                      <h3 className="text-sm md:text-base font-semibold text-slate-900 truncate">{session.title}</h3>
-                      <p className="text-xs text-slate-600 truncate">with <span className="font-medium text-slate-800">{session.trainer?.name ?? '—'}</span></p>
-                      <p className="text-xs text-slate-500 mt-1">
+                      <h3 className="text-sm md:text-base font-semibold text-gray-900 truncate">{session.title}</h3>
+                      <p className="text-xs text-gray-600 truncate">with <span className="font-medium text-gray-800">{session.trainer?.name ?? '—'}</span></p>
+                      <p className="text-xs text-gray-500 mt-1">
                         {session.scheduledDate ? new Date(session.scheduledDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '—'}
                       </p>
                     </div>
@@ -328,9 +334,9 @@ const StudentSessions = () => {
                   </div>
                 </div>
 
-                {session.description && <p className="text-sm text-slate-600 mt-3 line-clamp-2">{session.description}</p>}
+                {session.description && <p className="text-sm text-gray-600 mt-3 line-clamp-2">{session.description}</p>}
 
-                <div className="flex items-center text-xs text-slate-500 font-medium mt-3 gap-3">
+                <div className="flex items-center text-xs text-gray-500 font-medium mt-3 gap-3">
                   <div className="flex items-center gap-1"><Clock className="h-4 w-4" /><span>Duration: {session.duration}m</span></div>
                   {session.language && <div className="flex items-center gap-1"><span className="mx-1">•</span><span>Language: {session.language}</span></div>}
                   {session.level && <div className="flex items-center gap-1"><span className="mx-1">•</span><span>Level: {session.level}</span></div>}
@@ -343,8 +349,8 @@ const StudentSessions = () => {
             <div className="w-16 h-16 bg-[#0ea5a3]/10 rounded-full flex items-center justify-center mx-auto mb-3">
               <Calendar className="h-7 w-7 text-[#0ea5a3]" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">No sessions yet</h3>
-            <p className="text-sm text-slate-600 mb-4">Book your first session to get started</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">No sessions yet</h3>
+            <p className="text-sm text-gray-600 mb-4">Book your first session to get started</p>
             <Link to="/main" className="inline-flex items-center gap-2 px-4 py-2 bg-[#0ea5a3] text-white rounded-md text-sm hover:shadow">Browse Trainers</Link>
           </div>
         )}
@@ -353,17 +359,17 @@ const StudentSessions = () => {
       {/* Review Modal */}
       {showReviewModal && selectedSession && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-2xl p-5 max-w-lg w-full shadow-lg border border-white/20">
+          <div className="bg-white rounded-2xl p-5 max-w-lg w-full shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">Leave a Review</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Leave a Review</h3>
               <button onClick={() => setShowReviewModal(false)} className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center">
-                <X className="h-4 w-4 text-slate-600" />
+                <X className="h-4 w-4 text-gray-600" />
               </button>
             </div>
 
             <form onSubmit={handleReviewSubmit} className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Rating</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
                 <div className="flex gap-1">
                   {[1,2,3,4,5].map(star => (
                     <button key={star} type="button" onClick={() => setReviewData(prev => ({ ...prev, rating: star }))} className={`p-1 rounded-md transition-colors ${star <= reviewData.rating ? 'text-yellow-400' : 'text-slate-300 hover:text-yellow-300'}`} aria-label={`Rate ${star}`}>
@@ -374,12 +380,12 @@ const StudentSessions = () => {
               </div>
 
               <div>
-                <label htmlFor="comment" className="block text-sm font-medium text-slate-700 mb-2">Comment</label>
+                <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">Comment</label>
                 <textarea id="comment" value={reviewData.comment} onChange={(e) => setReviewData(prev => ({ ...prev, comment: e.target.value }))} className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0ea5a3] focus:border-transparent text-sm" rows={3} placeholder="Share your experience..." required />
               </div>
 
               <div className="flex gap-3">
-                <button type="button" onClick={() => setShowReviewModal(false)} className="flex-1 px-3 py-2 border border-gray-200 text-sm text-slate-700 rounded-md hover:bg-gray-50">Cancel</button>
+                <button type="button" onClick={() => setShowReviewModal(false)} className="flex-1 px-3 py-2 border border-gray-200 text-sm text-gray-700 rounded-md hover:bg-gray-50">Cancel</button>
                 <button type="submit" disabled={submittingReview} className="flex-1 px-3 py-2 bg-[#0ea5a3] text-white text-sm font-semibold rounded-md hover:shadow">
                   {submittingReview ? 'Submitting...' : 'Submit Review'}
                 </button>
@@ -393,33 +399,29 @@ const StudentSessions = () => {
 }
 
 /* ---------------- StudentProfile ---------------- */
-// components/StudentProfile.jsx
-
-
-const StudentProfile = () => {
-  const { user, updateProfile } = useAuth();
+const StudentProfile: React.FC = () => {
+  const { user, updateProfile } = useAuth() as AnyObj
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     profile: {
       bio: '',
-      languages: [],
+      languages: [] as string[],
       phone: '',
       location: '',
       imageUrl: '',
       highestQualification: '',
       collegeName: ''
     }
-  });
+  })
 
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState('')
+  const [error, setError] = useState('')
 
-  // Initialize formData from user when available
   useEffect(() => {
-    if (!user) return;
+    if (!user) return
     setFormData({
       name: user.name || '',
       email: user.email || '',
@@ -432,42 +434,41 @@ const StudentProfile = () => {
         highestQualification: user?.profile?.highestQualification || '',
         collegeName: user?.profile?.collegeName || ''
       }
-    });
-  }, [user]);
+    })
+  }, [user])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
     if (name.startsWith('profile.')) {
-      const profileField = name.split('.')[1];
+      const profileField = name.split('.')[1]
       setFormData(prev => ({
         ...prev,
         profile: {
           ...prev.profile,
           [profileField]: value
         }
-      }));
+      }))
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData(prev => ({ ...prev, [name]: value }))
     }
-  };
+  }
 
-  // handles file input -> convert to base64 data url (client-side preview)
-  const handleFileChange = (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
     reader.onload = () => {
-      const dataUrl = reader.result;
+      const dataUrl = reader.result as string
       setFormData(prev => ({
         ...prev,
         profile: {
           ...prev.profile,
           imageUrl: dataUrl
         }
-      }));
-    };
-    reader.readAsDataURL(file);
-  };
+      }))
+    }
+    reader.readAsDataURL(file)
+  }
 
   const handleRemoveImage = () => {
     setFormData(prev => ({
@@ -476,24 +477,22 @@ const StudentProfile = () => {
         ...prev.profile,
         imageUrl: ''
       }
-    }));
-  };
+    }))
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccess('');
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    setSuccess('')
 
-    // Basic client-side validation example (optional)
     if (!formData.name?.trim()) {
-      setError('Full name is required');
-      setLoading(false);
-      return;
+      setError('Full name is required')
+      setLoading(false)
+      return
     }
 
     try {
-      // updateProfile is expected to accept an object matching your backend's update endpoint
       const payload = {
         name: formData.name,
         profile: {
@@ -505,36 +504,35 @@ const StudentProfile = () => {
           highestQualification: formData.profile.highestQualification,
           collegeName: formData.profile.collegeName
         }
-      };
+      }
 
-      const result = await updateProfile(payload);
+      const result = await updateProfile?.(payload)
 
       if (result?.success) {
-        setSuccess('Profile updated successfully!');
-        // optionally refresh user context if updateProfile doesn't already
+        setSuccess('Profile updated successfully!')
       } else {
-        setError(result?.error || 'Failed to update profile');
+        setError(result?.error || 'Failed to update profile')
       }
     } catch (err) {
-      console.error(err);
-      setError('Failed to update profile');
+      console.error(err)
+      setError('Failed to update profile')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="space-y-6 max-w-[900px] mx-auto">
-      <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20">
-        <h2 className="text-2xl font-bold text-slate-900 mb-6">My Profile</h2>
+      <div className="glass-effect rounded-2xl p-6 shadow-xl">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">My Profile</h2>
 
-        {success && <div className="bg-green-50/80 backdrop-blur border-2 border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 font-semibold">{success}</div>}
-        {error && <div className="bg-red-50/80 backdrop-blur border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 font-semibold">{error}</div>}
-        
+        {success && <div className="bg-green-50 border-2 border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 font-semibold">{success}</div>}
+        {error && <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 font-semibold">{error}</div>}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Image: preview + URL + file upload */}
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Profile image</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Profile image</label>
 
             <div className="flex items-start gap-4">
               <div className="w-28 h-28 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border">
@@ -571,14 +569,14 @@ const StudentProfile = () => {
                   )}
                 </div>
 
-                <div className="text-xs text-slate-500">Tip: You can paste an image URL or upload a file. Upload uses a local base64 preview — to persist to server, your updateProfile should accept image data or you should upload to storage and save resulting URL.</div>
+                <div className="text-xs text-slate-500">Tip: Paste an image URL or upload a file. Upload uses a local base64 preview — to persist, your updateProfile should accept image data or you should upload to storage and save resulting URL.</div>
               </div>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
+              <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
               <input
                 type="text"
                 id="name"
@@ -591,7 +589,7 @@ const StudentProfile = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
+              <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
               <input
                 type="email"
                 id="email"
@@ -605,21 +603,21 @@ const StudentProfile = () => {
           </div>
 
           <div>
-            <label htmlFor="profile.bio" className="block text-sm font-bold text-slate-700 mb-2">Bio</label>
+            <label htmlFor="profile.bio" className="block text-sm font-bold text-gray-700 mb-2">Bio</label>
             <textarea
               id="profile.bio"
               name="profile.bio"
               value={formData.profile.bio}
               onChange={handleChange}
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5a3] focus:border-[#0ea5a3] transition-all duration-300 font-medium"
-              rows="3"
+              rows={3}
               placeholder="Tell us about yourself..."
             />
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="profile.phone" className="block text-sm font-bold text-slate-700 mb-2">Phone Number</label>
+              <label htmlFor="profile.phone" className="block text-sm font-bold text-gray-700 mb-2">Phone Number</label>
               <input
                 type="tel"
                 id="profile.phone"
@@ -632,7 +630,7 @@ const StudentProfile = () => {
             </div>
 
             <div>
-              <label htmlFor="profile.location" className="block text-sm font-bold text-slate-700 mb-2">Location</label>
+              <label htmlFor="profile.location" className="block text-sm font-bold text-gray-700 mb-2">Location</label>
               <input
                 type="text"
                 id="profile.location"
@@ -648,7 +646,7 @@ const StudentProfile = () => {
           {/* NEW: student-specific fields */}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="profile.highestQualification" className="block text-sm font-bold text-slate-700 mb-2">Highest Qualification</label>
+              <label htmlFor="profile.highestQualification" className="block text-sm font-bold text-gray-700 mb-2">Highest Qualification</label>
               <input
                 type="text"
                 id="profile.highestQualification"
@@ -661,7 +659,7 @@ const StudentProfile = () => {
             </div>
 
             <div>
-              <label htmlFor="profile.collegeName" className="block text-sm font-bold text-slate-700 mb-2">College / University</label>
+              <label htmlFor="profile.collegeName" className="block text-sm font-bold text-gray-700 mb-2">College / University</label>
               <input
                 type="text"
                 id="profile.collegeName"
@@ -674,7 +672,6 @@ const StudentProfile = () => {
             </div>
           </div>
 
-          
           <button
             type="submit"
             disabled={loading}
@@ -685,19 +682,16 @@ const StudentProfile = () => {
         </form>
       </div>
     </div>
-  );
-};
-
-
-
+  )
+}
 
 /* ---------------- StudentLanding ---------------- */
-const StudentLanding = () => {
-  const { user } = useAuth()
+const StudentLanding: React.FC = () => {
+  const { user } = useAuth() as AnyObj
 
   return (
     <div className="space-y-8 max-w-[1200px] mx-auto">
-      <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20">
+      <div className="glass-effect rounded-2xl p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Welcome back !</h1>
@@ -726,8 +720,8 @@ const StudentLanding = () => {
 }
 
 /* ---------------- StudentDashboard (root) ---------------- */
-const StudentDashboard = () => {
-  const { user, logout } = useAuth()
+const StudentDashboard: React.FC = () => {
+  const { user, logout } = useAuth() as AnyObj
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -738,50 +732,62 @@ const StudentDashboard = () => {
     { name: 'My Profile', href: '/student/profile', icon: User },
   ]
 
-  const isActive = (path) => {
+  const isActive = (path: string) => {
     if (path === '/student') return location.pathname === '/student' || location.pathname === '/student/'
     return location.pathname.startsWith(path)
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fbff]">
-      {sidebarOpen && <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+    <div className="min-h-screen bg-gradient-to-br from-soft-green via-cream to-soft-coral">
+      {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white/90 backdrop-blur-xl border-r border-white/30 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-4">
-          <div className="flex items-center mb-8 p-3 bg-[#0ea5a3]/10 rounded-xl">
-            <div className="w-10 h-10 bg-[#0ea5a3] rounded-xl flex items-center justify-center mr-3">
-              <User className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <div className="font-bold text-slate-900">{user?.name}</div>
-              <div className="text-sm text-slate-600 font-medium">Student</div>
-            </div>
-          </div>
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white bg-opacity-90 backdrop-blur-lg border-r border-white border-opacity-30 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between p-6 border-b border-white border-opacity-30">
+          <Link to="/" className="flex items-center">
+                      <div>
+                          <div className="text-lg font-semibold">LEARN🌎SPHERE</div>
+                          
+                        </div>
+                    </Link>
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-gray-700"><X className="h-6 w-6" /></button>
+        </div>
+
+        <div className="p-6">
+          
 
           <nav className="space-y-2">
             {navigation.map((item) => (
-              <Link key={item.name} to={item.href} className={`flex items-center w-full px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${isActive(item.href) ? 'bg-[#0ea5a3] text-white shadow-lg' : 'text-slate-700 hover:bg-gray-100 hover:text-[#0ea5a3]' }`} onClick={() => setSidebarOpen(false)}>
+              <Link key={item.name} to={item.href} className={`sidebar-link ${isActive(item.href) ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
                 <item.icon className="h-5 w-5 mr-3" /> {item.name}
               </Link>
             ))}
           </nav>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/20">
-          <button onClick={logout} className="flex items-center w-full px-4 py-3 text-slate-700 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-300 font-semibold">
+        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white border-opacity-30">
+          <button onClick={logout} className="flex items-center w-full px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-300">
             <LogOut className="h-5 w-5 mr-3" /> Sign Out
           </button>
         </div>
       </div>
 
       <div className="lg:pl-64">
+        <div className="bg-white bg-opacity-90 backdrop-blur-lg border-b border-white border-opacity-30 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-gray-500 hover:text-gray-700"><Menu className="h-6 w-6" /></button>
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-600">Role: <span className="font-semibold text-accent">Student</span></div>
+              {/* Example space for additional stats */}
+            </div>
+          </div>
+        </div>
+
         <div className="p-6">
           <Routes>
-            <Route path="/" element={<StudentHome />} />
-            <Route path="/home" element={<StudentLanding />} />
-            <Route path="/sessions" element={<StudentSessions />} />
-            <Route path="/profile" element={<StudentProfile />} />
+            <Route index element={<StudentHome />} />
+            <Route path="home" element={<StudentLanding />} />
+            <Route path="sessions" element={<StudentSessions />} />
+            <Route path="profile" element={<StudentProfile />} />
           </Routes>
         </div>
       </div>

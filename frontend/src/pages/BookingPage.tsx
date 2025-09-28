@@ -492,11 +492,11 @@ const BookingPage = () => {
     <div className="container">
       <div className="header-row">
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <div className="logo-box"><Globe /></div>
+          
           <div>
-            <div className="app-title">LinguaConnect</div>
-            <div className="app-sub">Secure checkout — choose your payment method</div>
-          </div>
+                <div className="text-lg font-semibold">LEARN🌎SPHERE</div>
+                <div className="text-xs text-slate-500 -mt-1">Live lessons · Micro-courses</div>
+              </div>
         </div>
         <button onClick={() => navigate(-1)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer' }}>
           <ArrowLeft /> Back

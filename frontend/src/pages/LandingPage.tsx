@@ -73,26 +73,23 @@ export default function LandingPageAlt() {
 
   const reviews = [
     {
-      name: 'Sarah J.',
-      role: 'Business professional',
+      name: 'Sarath',
+      
       text: 'The trainers are excellent — practical and patient. After a month I was comfortable conducting client calls in Spanish. The homework and recorded sessions were invaluable.',
       rating: 5
     },
     {
-      name: 'Marco P.',
-      role: 'University student',
+      name: 'Murali',
       text: 'Lessons are structured but flexible. My speaking confidence improved rapidly. The trainer recommended focused listening tasks that really helped.',
-      rating: 5
+      rating: 4
     },
     {
-      name: 'Aiko S.',
-      role: 'Traveler',
+      name: 'Akhil',
       text: 'The cultural mini-lessons helped me with real conversations while traveling. The trainer prepared a short phrase sheet for my trip — super useful!',
       rating: 5
     },
     {
-      name: 'Neha R.',
-      role: 'Designer',
+      name: 'Neha',
       text: 'Easy scheduling and consistent progress checks. I love the micro-lessons between full sessions.',
       rating: 4
     }
@@ -112,20 +109,19 @@ export default function LandingPageAlt() {
         <Container className="py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 bg-[#0ea5a3] rounded-xl flex items-center justify-center shadow-md" aria-hidden>
-                <Globe className="text-white" />
-              </div>
-              <div>
-                <div className="text-lg font-semibold">LearnOSphere</div>
-                <div className="text-xs text-slate-500 -mt-1">Live lessons · Micro-courses</div>
-              </div>
+              
+              <div className="flex flex-col items-center gap-1">
+  {/* Main Logo */}
+  {/* Main Logo */} <div className="text-2xl md:text-3xl font-[Good Vibes] font-extrabold tracking-wide relative inline-flex items-center"> {/* LEARN */} <span className="bg-gradient-to-r from-black via-gray-800 to-gray-700 bg-clip-text text-transparent drop-shadow-lg"> LEARN </span> {/* Rotating Globe */} <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 12, ease: "linear" }} className="inline-block mx-1 text-3xl" > 🌎 </motion.span> {/* SPHERE */} <span className="bg-gradient-to-r from-black via-gray-800 to-gray-700 bg-clip-text text-transparent drop-shadow-lg"> SPHERE </span> {/* Optional subtle shine */} <motion.div className="absolute top-0 left-0 w-full h-full bg-white/20 rounded-full blur-xl pointer-events-none" animate={{ x: [-200, 200] }} transition={{ repeat: Infinity, duration: 3, ease: "linear" }} /> </div>
+</div>
+
             </div>
 
             <nav className="hidden sm:flex items-center gap-6">
-              <Link to="/trainers" className="text-sm font-medium hover:text-[#0ea5a3]">Trainers</Link>
+              <Link to="/trainers" className="text-sm font-medium hover:text-[#0ea5a3]">Browse our Mentors</Link>
               
               
-              <Link to="/login" className="text-sm font-medium text-slate-700 hover:text-slate-900">Sign in</Link>
+              <Link to="/login" className="text-sm font-medium text-slate-700 hover:text-slate-900">Sign In</Link>
               <Link to="/register" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0ea5a3] text-white text-sm font-semibold shadow hover:scale-105 transition">Get started</Link>
             </nav>
 
@@ -139,9 +135,7 @@ export default function LandingPageAlt() {
                 <Offcanvas.Body>
                   <Nav className="flex-column gap-2">
                     <Nav.Link as={Link} to="/main" onClick={() => setShowOffcanvas(false)}>Trainers</Nav.Link>
-                    <Nav.Link as={Link} to="/plans" onClick={() => setShowOffcanvas(false)}>Pricing</Nav.Link>
-                    <Nav.Link as={Link} to="/about" onClick={() => setShowOffcanvas(false)}>About</Nav.Link>
-                    <Nav.Link as={Link} to="/login" onClick={() => setShowOffcanvas(false)}>Sign in</Nav.Link>
+                    <Nav.Link as={Link} to="/login" onClick={() => setShowOffcanvas(false)}>Sign In</Nav.Link>
                     <div className="mt-3">
                       <Link to="/register" onClick={() => setShowOffcanvas(false)} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0ea5a3] text-white text-sm font-semibold">Get started</Link>
                     </div>
@@ -163,7 +157,7 @@ export default function LandingPageAlt() {
               className="text-left"
             >
               <h1 className="text-4xl md:text-6xl font-serif leading-tight text-slate-900">
-                Speak with confidence — <span className="text-[#0ea5a3]">real tutors, real conversations</span>
+                Learn the Subject,Speak with Confidence — <span className="text-[#0ea5a3]">Real Tutors, Real Conversations</span>
               </h1>
 
               <p className="mt-6 text-lg text-slate-600 max-w-xl">
@@ -172,27 +166,20 @@ export default function LandingPageAlt() {
               </p>
 
               <div className="mt-6 flex items-center gap-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border text-sm text-slate-700 shadow-sm">⭐ 4.9 average rating</div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border text-sm text-slate-700 shadow-sm">✅ Verified tutors</div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border text-sm text-slate-700 shadow-sm">⏱️ 15–60 min lessons</div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border text-sm text-slate-700 shadow-sm">⭐ 4.9 Average Rating</div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border text-sm text-slate-700 shadow-sm">✅ Verified Tutors</div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border text-sm text-slate-700 shadow-sm">⏱️ 15–60 min Lessons</div>
               </div>
 
-              <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-xl">
-                {['english','Spanish'].map((l) => (
-                  <button key={l} className="flex items-center gap-3 px-4 py-3 rounded-full bg-white shadow-sm border hover:scale-[1.02] transition-transform focus:outline-none focus:ring-2 focus:ring-[#0ea5a3]" aria-label={`Browse ${l}`}>
-                    <div className="w-7 h-7 rounded-full bg-[#fde68a] flex items-center justify-center text-sm">{l[0]}</div>
-                    <span className="text-sm font-medium">{l}</span>
-                  </button>
-                ))}
-              </div>
+              
 
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link to="/trainers" className="inline-flex items-center gap-3 px-6 py-3 bg-[#0ea5a3] text-white rounded-lg shadow hover:scale-105 transition" aria-label="Start learning"> 
                   <Play />
-                  Start learning
+                  Start Learning
                 </Link>
                 <Link to="/register?role=trainer" className="inline-flex items-center gap-3 px-6 py-3 border border-[#0ea5a3] text-[#0ea5a3] rounded-lg hover:bg-[#ecfdf5] transition" aria-label="Become a trainer">
-                  <Users /> Become a trainer
+                  <Users /> Become a Trainer
                 </Link>
               </div>
 
@@ -247,6 +234,202 @@ export default function LandingPageAlt() {
         </div>
       </main>
 
+     {/* Language Levels Explanation */}
+<section
+  className="relative py-28 bg-gradient-to-b from-[#f8fbfd] via-white to-[#f0f9ff]"
+  aria-labelledby="sdil-courses"
+>
+  <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+    {/* Heading */}
+    <motion.h2
+      id="sdil-courses"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
+      className="text-4xl md:text-5xl font-serif text-slate-900 tracking-tight"
+    >
+      Languages That Open Doors  
+      <span className="block text-sky-700 mt-1">Speak to the World with Confidence</span>
+    </motion.h2>
+
+    {/* Subtitle */}
+    <motion.p
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+      viewport={{ once: true }}
+      className="mt-5 text-lg text-slate-600 max-w-3xl mx-auto"
+    >
+      Explore world languages guided by international certification standards.  
+      From beginner to advanced, every level is a milestone toward true global fluency.
+    </motion.p>
+
+    {/* Tag */}
+    <div className="mt-6 flex justify-center">
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border text-sm font-medium text-slate-700 shadow-sm">
+        🌍 Languages & Levels
+      </div>
+    </div>
+
+    {/* Unified Grid */}
+    <div className="mt-20 grid gap-10 lg:grid-cols-2">
+      {[
+        {
+          lang: "German",
+          pattern: "MMB Pattern",
+          levels: [
+            { name: "A1", desc: "Beginner – Introduce yourself, understand simple phrases, basic interactions." },
+            { name: "A2", desc: "Elementary – Handle everyday conversations, shopping, travel situations." },
+            { name: "B1", desc: "Intermediate – Discuss experiences, give opinions, manage school/work contexts." },
+          ],
+        },
+        {
+          lang: "French",
+          pattern: "DELF Pattern",
+          levels: [
+            { name: "A1", desc: "Basic greetings, introduce yourself, simple interactions." },
+            { name: "A2", desc: "Handle short conversations about familiar topics." },
+            { name: "B1", desc: "Speak with confidence, describe experiences, understand media." },
+          ],
+        },
+        {
+          lang: "Japanese",
+          pattern: "JLPT / Japan Foundation",
+          levels: [
+            { name: "N5", desc: "Understand basic hiragana/katakana, simple greetings & phrases." },
+            { name: "N4", desc: "Read & listen to daily topics, manage routine conversations." },
+            { name: "N3", desc: "Understand news, articles, and natural conversations." },
+          ],
+        },
+        {
+          lang: "Spanish",
+          pattern: "DELE Pattern",
+          levels: [
+            { name: "A1", desc: "Introduce yourself, use everyday vocabulary & phrases." },
+            { name: "A2", desc: "Converse about daily life, travel, shopping." },
+          ],
+        },
+        {
+          lang: "English",
+          pattern: "Cambridge English",
+          levels: [
+            { name: "A2", desc: "Elementary – Understand simple expressions, everyday contexts." },
+            { name: "B1", desc: "Intermediate – Converse in detail, describe experiences, opinions." },
+            { name: "B2", desc: "Upper Intermediate – Communicate fluently in academic & professional settings." },
+          ],
+        },
+        {
+          lang: "Sanskrit",
+          pattern: "Classical Language",
+          levels: [
+            { name: "Intro", desc: "Learn alphabets, chanting, and simple sentence formations." },
+          ],
+        },
+      ].map((course, idx) => (
+        <motion.div
+          key={idx}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: idx * 0.15 }}
+          viewport={{ once: true }}
+          className="relative bg-white rounded-2xl border border-slate-200 p-10 shadow-md hover:shadow-2xl transition-all duration-300 text-left"
+        >
+          {/* Language Header */}
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-semibold text-slate-900">{course.lang}</h3>
+            <span className="text-sm font-medium text-sky-700">{course.pattern}</span>
+          </div>
+
+          {/* Levels */}
+          <div className="mt-6 space-y-4">
+            {course.levels.map((level, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-4 rounded-lg bg-sky-50/70 p-4 border border-sky-100 hover:bg-sky-100 transition"
+              >
+                <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-sky-600 text-white font-bold text-sm shadow-inner">
+                  {level.name}
+                </div>
+                <p className="text-slate-700 text-sm leading-relaxed">{level.desc}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+<section
+  className="relative py-24 bg-white"
+  aria-labelledby="sdil-subjects"
+>
+  <div className="max-w-6xl mx-auto px-6 lg:px-8 text-center">
+    {/* Heading */}
+    <motion.h2
+      id="sdil-subjects"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+      viewport={{ once: true }}
+      className="text-4xl md:text-5xl font-serif text-slate-900 tracking-tight"
+    >
+      Subjects You Can Explore
+    </motion.h2>
+
+    {/* Subtitle */}
+    <motion.p
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+      viewport={{ once: true }}
+      className="mt-5 text-lg text-slate-600 max-w-2xl mx-auto"
+    >
+      Comprehensive courses across academic and professional subjects for holistic learning.
+    </motion.p>
+
+    {/* Grid Subjects */}
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      variants={{
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
+      }}
+      className="mt-16 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+    >
+      {[
+        "History",
+        "Geography",
+        "Physics",
+        "Chemistry",
+        "Mathematics",
+        "Biology",
+        "Economics",
+        "Computer Science",
+      ].map((subject, idx) => (
+        <motion.div
+          key={idx}
+          variants={{
+            hidden: { opacity: 0, y: 40 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+          }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
+          className="group relative bg-slate-50 rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-lg transition-all duration-300"
+        >
+          <div className="text-xl font-semibold text-slate-900">{subject}</div>
+        </motion.div>
+      ))}
+    </motion.div>
+  </div>
+</section>
+
+
+
       <section className="py-16 bg-white" aria-labelledby="how-it-works">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -272,7 +455,7 @@ export default function LandingPageAlt() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-3xl font-serif">Why learners love HIREGENIUS</h3>
+              <h3 className="text-3xl font-serif">Why learners love LEARN🌎SPHERE</h3>
               <p className="mt-4 text-slate-600 max-w-xl">Short lessons, lots of speaking time and tutors focused on practical outcomes. Learn phrases you’ll use the very next day.</p>
 
               <div className="mt-8 grid sm:grid-cols-3 gap-4">
@@ -306,6 +489,8 @@ export default function LandingPageAlt() {
           </div>
         </div>
       </section>
+      
+
 
       {/* Reviews */}
       <section className="py-16" aria-labelledby="reviews">
@@ -332,6 +517,86 @@ export default function LandingPageAlt() {
           </div>
         </div>
       </section>
+
+      <section
+  className="relative py-24 bg-gradient-to-b from-[#f0f9ff] to-white"
+  aria-labelledby="sdil-highlights"
+>
+  <div className="max-w-6xl mx-auto px-6 lg:px-8">
+    {/* Heading */}
+    <motion.h2
+      id="sdil-highlights"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+      viewport={{ once: true }}
+      className="text-4xl md:text-5xl font-serif text-slate-900 tracking-tight text-center"
+    >
+      Highlights of LEARN🌎SPHERE
+    </motion.h2>
+
+    {/* Subtitle */}
+    <motion.p
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+      viewport={{ once: true }}
+      className="mt-5 text-lg text-slate-600 max-w-2xl mx-auto text-center"
+    >
+      Our approach is designed to ensure effective learning, flexibility, and comprehensive support.
+    </motion.p>
+
+    {/* Image + Highlights */}
+    <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* Left Image */}
+      <motion.div
+        initial={{ opacity: 0, x: -40 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="flex justify-center"
+      >
+        <img
+          src="https://tse1.mm.bing.net/th/id/OIP.wDczP_2HXmI-762eR-rEoQHaHa?w=612&h=612&rs=1&pid=ImgDetMain&o=7&rm=3"
+          alt="Learning Highlights"
+          className="rounded-2xl shadow-md max-w-sm w-full object-cover"
+        />
+      </motion.div>
+
+      {/* Right Bullet Points */}
+      <motion.ul
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
+        }}
+        className="space-y-4 text-lg text-slate-800 list-disc list-inside"
+      >
+        {[
+          "Flexible Timings",
+          "Language Lab Facility",
+          "Online + Offline Batches",
+          "Certified Courses",
+          "Expert Faculty",
+          "Personalized Support & Guidance",
+        ].map((point, idx) => (
+          <motion.li
+            key={idx}
+            variants={{
+              hidden: { opacity: 0, y: 15 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+            }}
+          >
+            {point}
+          </motion.li>
+        ))}
+      </motion.ul>
+    </div>
+  </div>
+</section>
+
 
       {/* FAQ */}
       <section className="py-16" aria-labelledby="faq-heading">
@@ -373,9 +638,9 @@ export default function LandingPageAlt() {
       <footer className="bg-slate-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
           <div>
-            <div className="font-semibold text-lg">LinguaNest</div>
-            <div className="text-sm text-slate-400 mt-2">© {new Date().getFullYear()} LinguaNest — All rights reserved</div>
-            <div className="mt-4 text-sm text-slate-400">Email: hello@linguanest.example</div>
+            <div className="font-semibold text-lg">LearnOSphere</div>
+            <div className="text-sm text-slate-400 mt-2">© {new Date().getFullYear()} LearnOSphere — All rights reserved</div>
+            <div className="mt-4 text-sm text-slate-400">Email: hello@learnOsphere.example</div>
             <div className="text-sm text-slate-400">Phone: +1 (555) 123-4567</div>
           </div>
 
@@ -411,7 +676,7 @@ export default function LandingPageAlt() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 mt-8 border-t border-white/10 pt-6 text-sm text-slate-400 flex flex-col sm:flex-row justify-between">
-          <div>Made with ❤️ in LinguaNest — 123 Language St, Suite 4, New York, NY</div>
+          <div>Made with ❤️ in LearnOSphere</div>
           <div className="mt-3 sm:mt-0">Version 1.0 • Privacy policy</div>
         </div>
       </footer>

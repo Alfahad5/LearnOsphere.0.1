@@ -124,10 +124,10 @@ const SessionRoom = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <div className="w-10 h-10 bg-gradient-to-br from-accent to-soft-coral rounded-xl flex items-center justify-center mr-3">
-                <Globe className="h-6 w-6 text-white" />
+              <div>
+                <div className="text-lg font-semibold">LEARN🌎SPHERE</div>
+                <div className="text-xs text-slate-500 -mt-1">Live lessons · Micro-courses</div>
               </div>
-              <span className="text-xl font-bold text-gradient">LinguaConnect</span>
             </div>
             
             <button

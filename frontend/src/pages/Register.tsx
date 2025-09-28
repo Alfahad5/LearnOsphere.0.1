@@ -90,7 +90,7 @@ const Register: React.FC = () => {
       <div className="max-w-md w-full mx-4 relative z-10">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Join HIREGENIUS
+            Join Learn🌎Sphere
           </h1>
           <p className="text-slate-600">
             Start your language learning journey today

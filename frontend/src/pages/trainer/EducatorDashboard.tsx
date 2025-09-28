@@ -940,9 +940,11 @@ const EducatorDashboard = () => {
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white bg-opacity-90 backdrop-blur-lg border-r border-white border-opacity-30 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between p-6 border-b border-white border-opacity-30">
           <Link to="/" className="flex items-center">
-            <div className="w-10 h-10 bg-gradient-to-br from-accent to-soft-coral rounded-xl flex items-center justify-center mr-3"><Globe className="h-6 w-6 text-white" /></div>
-            <span className="text-xl font-bold text-gradient">LinguaConnect</span>
-          </Link>
+                                <div>
+                                    <div className="text-lg font-semibold">LEARN🌎SPHERE</div>
+                                    
+                                  </div>
+                              </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-gray-700"><X className="h-6 w-6" /></button>
         </div>
 
