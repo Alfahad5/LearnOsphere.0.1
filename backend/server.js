@@ -14,11 +14,12 @@ dotenv.config();
 const app = express();
 
 // Read frontend origins from .env (comma-separated)
-const frontendEnv = process.env.FRONTEND_URL || 'http://localhost:3000';
-const allowedOrigins = frontendEnv
-  .split(',')
-  .map(u => u.trim())
-  .filter(Boolean);
+
+const allowedOrigins = [
+  'http://localhost:5173',   // Vite default
+  'http://localhost:3000',   // CRA default
+  process.env.FRONTEND_URL,  // your deployed frontend (e.g., https://learnosphere.vercel.app)
+].filter(Boolean); // remove undefined
 
 // Middleware - robust CORS using env variable
 app.use(cors({
@@ -31,7 +32,9 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
 
 // Routes
 app.use('/api/auth', authRoutes);

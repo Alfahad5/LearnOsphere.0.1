@@ -1,0 +1,15 @@
+# dependencies
+node_modules/
+
+# environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# build output
+dist/
+build/
+
+# logs
+*.log
