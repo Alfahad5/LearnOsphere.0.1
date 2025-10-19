@@ -9,7 +9,7 @@ export default defineConfig({
     proxy: {
       // forward any /api/* request to your backend running on 5000
       '/api': {
-        target: 'http://localhost:5000',
+        target: process.env.VITE_API_BASE_URL || 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
         // rewrite optional — here it keeps the /api path as-is

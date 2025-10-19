@@ -15,6 +15,8 @@ import {
 } from 'lucide-react'
 import axios from 'axios'
 import { motion } from 'framer-motion'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL  // for Vite
+// or for Next.js: process.env.NEXT_PUBLIC_API_BASE_URL
 
 /** Trainer types: demoVideo optional */
 interface Trainer {
@@ -108,7 +110,7 @@ const Trainer: React.FC = () => {
     let mounted = true
     const fetchTrainers = async () => {
       try {
-        const response = await axios.get('/api/users/trainers')
+        const response = await axios.get(`${API_BASE_URL}/api/users/trainers`)
         const data = Array.isArray(response.data) ? response.data : []
         if (mounted) setTrainers(data)
       } catch (error) {

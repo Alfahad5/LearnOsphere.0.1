@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Video, VideoOff, Mic, MicOff, Phone, Users, Clock, Globe, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import axios from 'axios'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL  // for Vite
+// or for Next.js: process.env.NEXT_PUBLIC_API_BASE_URL
 
 interface Session {
   _id: string
@@ -63,7 +65,7 @@ const SessionRoom = () => {
     if (!session || user?.role !== 'trainer') return
     
     try {
-      await axios.put(`/api/sessions/${session._id}/status`, { status: 'active' })
+      await axios.put(`${API_BASE_URL}/api/sessions/${session._id}/status`, { status: 'active' })
       setSessionStarted(true)
       setSession({ ...session, status: 'active' })
     } catch (error) {
@@ -75,7 +77,7 @@ const SessionRoom = () => {
     if (!session || user?.role !== 'trainer') return
     
     try {
-      await axios.put(`/api/sessions/${session._id}/status`, { status: 'completed' })
+      await axios.put(`${API_BASE_URL}/api/sessions/${session._id}/status`, { status: 'completed' })
       navigate(user.role === 'trainer' ? '/trainer/sessions' : '/student/sessions')
     } catch (error) {
       console.error('Failed to end session:', error)

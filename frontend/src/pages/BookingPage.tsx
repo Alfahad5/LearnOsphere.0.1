@@ -25,6 +25,8 @@ import {
 } from '@stripe/react-stripe-js'
 import axios from 'axios'
 import { useAuth } from '../contexts/AuthContext'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL  // for Vite
+// or for Next.js: process.env.NEXT_PUBLIC_API_BASE_URL
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
@@ -171,7 +173,7 @@ const PaymentPanel = ({ trainer, selectedMethod, onPaymentSuccess, onPaymentErro
         }
 
         // Create payment intent (kept same as original: amount not multiplied)
-        const { data } = await axios.post('/api/payments/create-payment-intent', {
+        const { data } = await axios.post(`${API_BASE_URL}/api/payments/create-payment-intent`, {
           amount: trainer.profile?.hourlyRate || 25,
           currency: 'usd'
         })
@@ -188,7 +190,7 @@ const PaymentPanel = ({ trainer, selectedMethod, onPaymentSuccess, onPaymentErro
           onPaymentError(result.error.message)
         } else {
           // Create booking
-          const bookingResponse = await axios.post('/api/bookings', {
+          const bookingResponse = await axios.post(`${API_BASE_URL}/api/bookings`, {
             trainerId: trainer._id,
             studentName,
             paymentMethod: 'stripe',
@@ -196,7 +198,7 @@ const PaymentPanel = ({ trainer, selectedMethod, onPaymentSuccess, onPaymentErro
           })
 
           // Update payment status
-          await axios.put(`/api/bookings/${bookingResponse.data._id}/payment`, {
+          await axios.put(`${API_BASE_URL}/api/bookings/${bookingResponse.data._id}/payment`, {
             paymentStatus: 'completed',
             paymentId: result.paymentIntent.id
           })
@@ -213,12 +215,12 @@ const PaymentPanel = ({ trainer, selectedMethod, onPaymentSuccess, onPaymentErro
         }
       } else {
         // Demo flow: call fake-payment endpoint (keeps your original flow)
-        const fakePaymentResponse = await axios.post('/api/payments/fake-payment', {
+        const fakePaymentResponse = await axios.post(`${API_BASE_URL}/api/payments/fake-payment`, {
           amount: trainer.profile?.hourlyRate || 25
         })
 
         // Create booking
-        const bookingResponse = await axios.post('/api/bookings', {
+        const bookingResponse = await axios.post(`${API_BASE_URL}/api/bookings`, {
           trainerId: trainer._id,
           studentName,
           paymentMethod: 'fake',
@@ -226,7 +228,7 @@ const PaymentPanel = ({ trainer, selectedMethod, onPaymentSuccess, onPaymentErro
         })
 
         // Update payment status
-        await axios.put(`/api/bookings/${bookingResponse.data._id}/payment`, {
+        await axios.put(`${API_BASE_URL}/api/bookings/${bookingResponse.data._id}/payment`, {
           paymentStatus: 'completed',
           paymentId: fakePaymentResponse.data.paymentId
         })
@@ -382,7 +384,7 @@ const BookingPage = () => {
 
   const fetchTrainer = async () => {
     try {
-      const response = await axios.get(`/api/users/profile/${trainerId}`)
+      const response = await axios.get(`${API_BASE_URL}/api/users/profile/${trainerId}`)
       setTrainer(response.data)
     } catch (err) {
       setError('Failed to load trainer information')
